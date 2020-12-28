@@ -30,7 +30,7 @@ def getClassLabelFor(list, batch_size=190):
     for i in list:
         y_=np.full((1, batch_size), i)[0]
         y=np.hstack([y, y_])
-    
+
     return y
 
 # Cluster Algorithm
@@ -46,14 +46,17 @@ def kmeans(dataset, n_clusters, normalization='standard'):
         scaler = MinMaxScaler().fit(dataset)
         scaled_dataset = scaler.transform(dataset)
     else:
+        scaled_dataset = dataset
         print("정규화 진행 안함")
-
+    print("Scaled_dataset: \n{}".format(scaled_dataset))
     cluster_data = KMeans(n_clusters=n_clusters).fit(scaled_dataset)
     return cluster_data, scaled_dataset
 
 ## epsilon : distance between nodes
 ## min_samples : 메인 노드가 가져야 하는 최소 노드 개수
 def dbscan(dataset, eps=0.5, min_samples=5, normalization='standard'):
+
+    scaled_dataset = []
     if normalization == 'standard':
         scaler = StandardScaler().fit(dataset)
         scaled_dataset = scaler.transform(dataset)
@@ -61,25 +64,25 @@ def dbscan(dataset, eps=0.5, min_samples=5, normalization='standard'):
         scaler = MinMaxScaler().fit(dataset)
         scaled_dataset = scaler.transform(dataset)
     else:
+        scaled_dataset = dataset
         print("정규화 진행 안함")
-    
-    algorithm == 'dbscan'
+
     dbscan = DBSCAN(eps=eps, min_samples=min_samples)
     cluster_data = dbscan.fit_predict(scaled_dataset)
 
     return cluster_data, scaled_dataset
 
 ## 그래프로 나타내기 (2차원 경우 가능)
-# cluster_result: 리스트 
+# cluster_result: 리스트
 # class_num : 클래스 넘버 리스트
 def visualization_clusters(dataset, cluster_result, class_num):
     df=np.hstack([dataset, cluster_result.reshape(-1, 1)])
     class_list = []
     for i in range(len(class_num)):
         _class = df[df[:, 2]==class_num[i], :]
-        
+
         class_list.append(_class)
-        
+
     class_list = np.array(class_list)
     for i in range(len(class_num)):
         plt.scatter(class_list[i][:, 0], class_list[i][ :, 1], label="class{}".format(i), cmap='Pairs')
