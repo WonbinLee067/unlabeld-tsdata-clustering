@@ -71,7 +71,9 @@ def dbscan(dataset, eps=0.5, min_samples=5, normalization='standard'):
     cluster_data = dbscan.fit_predict(scaled_dataset)
 
     return cluster_data, scaled_dataset
-
+#################
+## spectral clustering
+#################
 ## 그래프로 나타내기 (2차원 경우 가능)
 # cluster_result: 리스트
 # class_num : 클래스 넘버 리스트
