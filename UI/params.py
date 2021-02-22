@@ -8,6 +8,7 @@ import core_components as cc
 import main_algorithm as MA
 import par_clstr_algorithm as pCA
 import par_img_data as pid
+import par_dtw as pDtw
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -81,6 +82,21 @@ def image_data_param(data_type):
         params = pid.recurrence_plot()
     elif data_type == 'RAW': 
         params = pid.raw_img()
+    return params
+
+####                                           ####
+# DTW / soft-DTW 에 대한 특정 파라미터를 생성합니다. #
+####                                           ####
+@app.callback(
+    Output(component_id='param-for-dtw', component_property='children'),
+    Input(component_id='distance-alogrithm', component_property='value')
+)
+def image_data_param(data_type):
+    params = []
+    if data_type == 'DTW':
+        params = pDtw.dtw()
+    elif data_type == 'SDT': 
+        params = pDtw.soft_dtw()
     return params
 
 if __name__ == '__main__':

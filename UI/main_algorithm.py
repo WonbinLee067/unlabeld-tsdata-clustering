@@ -45,6 +45,10 @@ def time_sereies_kmeans():
             cc.radio_layout('tolerance', [
                 {'label': '1e-4', 'value': 'O_F'},
             ], 'O_F'), 
+            html.Label('Try N Times for another center'),
+            cc.num_input_layout('try_n_init', min=1),
+            html.Label('KMeans를 시도해볼 횟수'),
+            cc.num_input_layout('try_n_kmeans'),
         ], style={'columnCount': 1})
     return layout
 
