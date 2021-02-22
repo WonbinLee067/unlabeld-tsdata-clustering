@@ -44,8 +44,7 @@ def time_sereies_kmeans():
             html.Label('Tolerance, default = 1e-4'),
             cc.radio_layout('tolerance', [
                 {'label': '1e-4', 'value': 'O_F'},
-            ])
-
+            ], 'O_F'), 
         ], style={'columnCount': 1})
     return layout
 
