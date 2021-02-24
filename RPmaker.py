@@ -1,30 +1,12 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from pyts.image import RecurrencePlots
+#from pyts.image import RecurrencePlots
+from pyts.image import RecurrencePlot
 import os
 
 def readFile(filepath):
-    finalData = {}
-    data = pd.read_csv(filepath)
-    print(data)
-    uniqueChip = data['chip'].unique()
-    uniqueWire = data['wire'].unique()
-    uniquePar = data['parameter'].unique()
-    uniqueSeg = data['segment'].unique()
-
-    for chip in uniqueChip:
-        for wire in uniqueWire:
-            for par in uniquePar:
-                for seg in uniqueSeg:
-                    chipFilter = data.loc[data["chip"] == chip]
-                    wireFilter = chipFilter.loc[data["wire"] == wire]
-                    parFilter = wireFilter.loc[data["parameter"] == par]
-                    segFilter = parFilter.loc[data["segment"] == seg, "value"]
-                    result = segFilter.to_numpy()
-                    result = np.reshape(result,(1,len(result)))
-                    label = chip + "_" + wire + "_" + par +"_" +str(seg)
-                    finalData[label] = result
+    
     return finalData
 
 
@@ -57,6 +39,21 @@ def makeRPImgFiles(dirPath, dicDatas, width=28, height=28, dpi=96, ):
 
         plt.savefig(filename, dpi=dpi,  bbox_inches='tight', pad_inches=0.0)
 
+# input : Time Series Dataset 
+# output : X Dataset converted into RP image data
+def toRPdata(tsdatas, dimension=1, time_delay=1, threshold=None, percentage=10, flatten=False):
+    X = []
+    rp = RecurrencePlot(dimension= dimension,
+                        time_delay= time_delay,
+                        threshold= threshold,
+                        percentage= percentage,
+                        flatten= flatten)
+    for data in tsdatas:
+        data_rp = rp.fit_transform(data)
+        X.append(data_rp[0])
+    X = np.array(X)
+    return X
+    
 '''
 How to Use
 ----------------
