@@ -32,7 +32,6 @@ def updateLayout(figure, name, yaxis='value'):
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-new_style = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 GG = {
     'gr1':[0,1,2,5,4,8],
@@ -49,22 +48,21 @@ colors = {
 fig = makeGraph(GG, 4, list(GG.keys()), 'teal')
 updateLayout(fig, 'GG1')
 
-new_style.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
-    html.H1(
-        children='AXISX',
-        style={
-            'textAlign': 'center',
-            'color': colors['text']
-        }
-    ),
+def graphDiv():
+    graph = html.Div(style={'backgroundColor': colors['background']}, children=[
+        html.H1(
+            children='AXISX',
+            style={
+                'textAlign': 'center',
+                'color': colors['text']
+            }
+        ),
 
-    dcc.Graph(
-        id='GG',
-        figure=fig
-    )
-])
-
-if __name__ == '__main__':
-    new_style.run_server(debug=True)
+        dcc.Graph(
+            id='GG',
+            figure=fig
+        )
+    ])
+    return graph
 
 
