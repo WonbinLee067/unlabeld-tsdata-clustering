@@ -23,7 +23,7 @@ import par_dtw as pDtw
 import core_components as cc
 from read_csv import csvDiv, parse_contents
 from text_data import textResultDiv
-from result_graph import graphDiv
+from result_graph import graphCluster
 
 
 
@@ -174,7 +174,7 @@ app.layout = html.Div(
                                 textResultDiv()
                             ]),
                             html.Div([
-                                graphDiv()
+                                graphCluster()
                             ])
                         ],
                             id="countGraphContainer",

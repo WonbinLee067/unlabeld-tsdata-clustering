@@ -672,3 +672,10 @@ there.
 	.section input[id="slide02"]:checked ~ .slidewrap .slide-pagelist > li:nth-child(2) > label {background:#999;}
 	.section input[id="slide03"]:checked ~ .slidewrap .slide-pagelist > li:nth-child(3) > label {background:#999;}
 
+  .graph{
+      display: inline-block;
+      width:30%;
+      height:50px;
+      padding: 10px;
+    }
+  }
