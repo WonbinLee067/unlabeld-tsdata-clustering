@@ -36,6 +36,13 @@ def updateLayout(figure, name, yaxis='value'):
         yaxis_title=yaxis
     )
 
+def getGraphCluster(graph):
+    fig=[]
+    for i in range(0,len(graph)):
+        fig.append(makeGraph(graph[i], 'teal'))
+        updateLayout(graph[i], 'cluster'+str(i))
+    return fig
+
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -64,60 +71,54 @@ for i in range(0,len(GG)):
     fig.append(makeGraph(GG[i], 'teal'))
     updateLayout(fig[i], 'cluster'+str(i))
 
-def graphDiv():
-    graph = html.Div(style={'backgroundColor': colors['background'], 'width':"30%", 'height':'100px'}, children=[
+def graphCluster():
 
-        dcc.Graph(
-            id='G1',
-            figure=fig[0]
-        ),
-
-        # dcc.Graph(
-        #     id='G2',
-        #     figure=fig[1]
-        # ),
-
-        # dcc.Graph(
-        #     id='G3',
-        #     figure=fig[2]
-        # ),
-
+    graph = html.Div(style={ }, children=[
         html.Div(
-            [dcc.RadioItems(
-                options=[
-                    {'label':'Slide01', 'value':'slide01'},
-                ],id='slide01',inputClassName='slide'
-            ),
-            dcc.RadioItems(
-                options=[
-                    {'label':'Slide02', 'value':'slide02'},
-                ],id='slide02',inputClassName='slide'
-            ),
-            dcc.RadioItems(
-                options=[
-                    {'label':'Slide03', 'value':'slide03'},
-                ],id='slide03',inputClassName='slide'
-            ),
-            html.Div([
-                html.Ul([
-                    html.Li([], className='slideitem')
-                ], className='slidelist')
+            [html.Div(
+                [dcc.Graph(
+                    id='G1',
+                    figure=fig[0]
+                )], className='graph'),
 
-            ], className='slidewrap'), 
+            html.Div(
+                [dcc.Graph(
+                    id='G2',
+                    figure=fig[1]
+                )], className='graph'),
 
-            dcc.RadioItems(
-                options=[
-                    {'label':'Slide01', 'value':'slide01' },
-                    {'label':'Slide02', 'value':'slide02'''},
-                    {'label':'Slide03', 'value':'slide03'},
-                ],
-                value='slide01'
-            )
-        ],
-         className="section")
+            html.Div(
+                [dcc.Graph(
+                    id='G3',
+                    figure=fig[2]
+                )], className='graph')
     ])
-    
+    ])
 
     return graph
 
+def graphEach():
+    graph = html.Div(style={ }, children=[
+        html.Div(
+            [html.Div(
+                [dcc.Graph(
+                    id='G1',
+                    figure=fig[0]
+                )], className='graph'),
+
+            html.Div(
+                [dcc.Graph(
+                    id='G2',
+                    figure=fig[1]
+                )], className='graph'),
+
+            html.Div(
+                [dcc.Graph(
+                    id='G3',
+                    figure=fig[2]
+                )], className='graph')
+        ])
+    ])
+
+    return graph
 
