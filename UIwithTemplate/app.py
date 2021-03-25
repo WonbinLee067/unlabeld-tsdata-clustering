@@ -23,7 +23,7 @@ import par_dtw as pDtw
 import core_components as cc
 from read_csv import csvDiv, parse_contents
 from text_data import textResultDiv
-from result_graph import graphCluster
+from result_graph import graphDetail, graphCluster
 
 
 
@@ -190,7 +190,7 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [dcc.Graph(id="main_graph")],
+                    [graphDetail()],
                     className="pretty_container seven columns",
                 ),
                 html.Div(
@@ -198,7 +198,7 @@ app.layout = html.Div(
                     className="pretty_container five columns",
                 ),
             ],
-            className="row flex-display",
+            className="row flex-display ",
         ),
         html.Div(
             [
