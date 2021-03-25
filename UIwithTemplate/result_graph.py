@@ -21,7 +21,7 @@ def makeGraph_dictionary(graph, n, label, color):
 
     return fig
 
-def makeGraph(graph, color):
+def makeGraph_Cluster(graph, color):                    
     
     fig = go.Figure()
     for i in range(0, len(graph)):
@@ -36,13 +36,18 @@ def updateLayout(figure, name, yaxis='value'):
         yaxis_title=yaxis
     )
 
-def getGraphCluster(graph):
-    fig=[]
-    for i in range(0,len(graph)):
-        fig.append(makeGraph(graph[i], 'teal'))
-        updateLayout(graph[i], 'cluster'+str(i))
+def makeGraph_Detail(graph, color):                    
+    
+    fig = go.Figure(data=go.Scatter(y=graph,  line=dict(color=color)))
     return fig
-
+    
+# figure: makeGraph()를 이용해 만든 그래프
+# label: 그래프 이름
+def updateLayout_Detail(figure, name, yaxis='value'):
+    figure.update_layout(
+        title=name,
+        yaxis_title=yaxis
+    )
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -68,8 +73,15 @@ colors = {
 
 fig=[]
 for i in range(0,len(GG)):
-    fig.append(makeGraph(GG[i], 'teal'))
+    fig.append(makeGraph_Cluster(GG[i], 'teal'))
     updateLayout(fig[i], 'cluster'+str(i))
+
+fig1=[]
+for i in range(0,len(GG[0])):
+    fig1.append(makeGraph_Detail(GG[0][i], 'firebrick'))
+    updateLayout(fig1[i], 'Cluster0_randomData'+str(i))
+
+
 
 def graphCluster():
 
@@ -91,31 +103,38 @@ def graphCluster():
                 [dcc.Graph(
                     id='G3',
                     figure=fig[2]
-                )], className='graph')
-    ])
+                )], className='graph'),
+            
+            ])
     ])
 
     return graph
 
-def graphEach():
+def graphDetail():
     graph = html.Div(style={ }, children=[
         html.Div(
             [html.Div(
                 [dcc.Graph(
-                    id='G1',
-                    figure=fig[0]
+                    id='g1',
+                    figure=fig1[0]
                 )], className='graph'),
 
             html.Div(
                 [dcc.Graph(
-                    id='G2',
-                    figure=fig[1]
+                    id='g2',
+                    figure=fig1[1]
                 )], className='graph'),
 
             html.Div(
                 [dcc.Graph(
-                    id='G3',
-                    figure=fig[2]
+                    id='g3',
+                    figure=fig1[2]
+                )], className='graph'),
+            
+            html.Div(
+                [dcc.Graph(
+                    id='g4',
+                    figure=fig1[3]
                 )], className='graph')
         ])
     ])
