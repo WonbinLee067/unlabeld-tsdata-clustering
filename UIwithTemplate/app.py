@@ -149,8 +149,10 @@ app.layout = html.Div(
             className="row flex-display",
             style={"margin-bottom": "25px"},
         ),
+        # 파라미터 조작, 파일삽입, 군집화 결과 컴포넌트 틀
         html.Div(
             [
+                # 파라미터 조작 컴포넌트
                 html.Div(
                     [
                         ParameterDiv()
@@ -158,8 +160,10 @@ app.layout = html.Div(
                     className="pretty_container four columns",
                     id="cross-filter-options",
                 ),
+                # 오른쪽 부분 컴포넌트 틀 (파일 삽입, 군집화 결과)
                 html.Div(
                     [
+                        # 파일 삽입 컴포넌트
                         html.Div(
                             [
                                 html.Div(
@@ -171,6 +175,7 @@ app.layout = html.Div(
                             id="info-container",
                             className="row container-display",
                         ),
+                        # 군집화 결과 그래프 컴포넌트
                         html.Div([
                             html.Div([
                                 textResultDiv()
@@ -189,8 +194,10 @@ app.layout = html.Div(
             ],
             className="row flex-display",
         ),
+        # 하단/ 군집화 세부적 결과 그래프 (크게보기, 하나씩 보기)
         html.Div(
             [
+                # 세부적 결과 그래프 컴포넌트
                 html.Div(
                     #보기1
                     [graphDetail()],
@@ -199,6 +206,8 @@ app.layout = html.Div(
 #                     [graphBig()],
 #                     className="pretty_container seven columns fullgraph_class",
                 ),
+                # 세부적 결과 그래프 선택 조작 컴포넌트
+                ## 여기서 컴포넌트를 조작하여 위 세부적 결과 그래프 형태를 선택한다.
                 html.Div(
                     [dcc.Graph(id="individual_graph")],
                     className="pretty_container five columns",
