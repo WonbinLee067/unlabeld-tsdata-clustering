@@ -24,7 +24,7 @@ import core_components as cc
 from read_csv import csvDiv, parse_contents
 from text_data import textResultDiv
 from result_graph import graphDetail, graphCluster, graphBig
-
+import show_detail as sd
 
 
 # get relative data folder
@@ -199,24 +199,13 @@ app.layout = html.Div(
             [
                 # 세부적 결과 그래프 컴포넌트
                 html.Div(
-                    #보기1
-                    [graphDetail()],
-                    className="pretty_container seven columns",
-                    #보기2
-#                     [graphBig()],
-#                     className="pretty_container seven columns fullgraph_class",
+                    id='detail-graph-output'
                 ),
                 # 세부적 결과 그래프 선택 조작 컴포넌트
                 ## 여기서 컴포넌트를 조작하여 위 세부적 결과 그래프 형태를 선택한다.
                 html.Div(
-                    # 삽입해야 할 컨트롤 컴포넌트
-                    # 그래프 형태 유형 
-                    ## graphDetail
-                    ## graphBig
-                    # 그래프 개수 선택
-                    ## 보여줄 그래프의 개수를 선택할 수 있다.
-                    [dcc.Graph(id="individual_graph")],
-                    className="pretty_container five columns",
+                    sd.detailGraphOption(),
+                    className="pretty_container five columns"
                 ),
             ],
             className="row flex-display ",
@@ -763,6 +752,29 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
             parse_contents(c, n, d) for c, n, d in
             zip(list_of_contents, list_of_names, list_of_dates)]
         return children    
+
+####                                                           ####
+# 컨트롤 컴포넌트에 의해 세부적 그래프 컴포넌트가 달라집니다. #
+####                                                           ####
+@app.callback(
+    # my-output id를 가진 컴포넌트의 children 속성으로 들어간다.
+    Output(component_id='detail-graph-output', component_property='children'),
+    Output(component_id='detail-graph-output', component_property='className'),
+    # my-input id 를 가진 컴포넌트의 value 속성을 가져온다.
+    Input('detail-graph-submit', 'n_clicks'),
+    State(component_id='detail-graph-input', component_property='value'),
+    State(component_id='num-of-graphs', component_property='value')
+)
+def update_parameter(n_clicks, detail_graph, num_graph):
+    layout = []
+    clsName = ''
+    if detail_graph == 'GrDt':
+        layout = graphDetail()
+        clsName = "pretty_container seven columns"
+    elif detail_graph == 'GrBg':
+        layout = graphBig()
+        clsName = "pretty_container seven columns fullgraph_class"
+    return layout, clsName
 
 # Main
 if __name__ == "__main__":
