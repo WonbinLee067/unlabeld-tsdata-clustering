@@ -209,6 +209,12 @@ app.layout = html.Div(
                 # 세부적 결과 그래프 선택 조작 컴포넌트
                 ## 여기서 컴포넌트를 조작하여 위 세부적 결과 그래프 형태를 선택한다.
                 html.Div(
+                    # 삽입해야 할 컨트롤 컴포넌트
+                    # 그래프 형태 유형 
+                    ## graphDetail
+                    ## graphBig
+                    # 그래프 개수 선택
+                    ## 보여줄 그래프의 개수를 선택할 수 있다.
                     [dcc.Graph(id="individual_graph")],
                     className="pretty_container five columns",
                 ),
