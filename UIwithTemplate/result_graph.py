@@ -89,19 +89,19 @@ def graphCluster():
         html.Div(
             [html.Div(
                 [dcc.Graph(
-                    id='G1',
+                    id='GC1',
                     figure=fig[0]
                 )], className='graph'),
 
             html.Div(
                 [dcc.Graph(
-                    id='G2',
+                    id='GC2',
                     figure=fig[1]
                 )], className='graph'),
 
             html.Div(
                 [dcc.Graph(
-                    id='G3',
+                    id='GC3',
                     figure=fig[2]
                 )], className='graph'),
             
@@ -115,28 +115,44 @@ def graphDetail():
         html.Div(
             [html.Div(
                 [dcc.Graph(
-                    id='g1',
+                    id='GD1',
                     figure=fig1[0]
                 )], className='graph'),
 
             html.Div(
                 [dcc.Graph(
-                    id='g2',
+                    id='GD2',
                     figure=fig1[1]
                 )], className='graph'),
 
             html.Div(
                 [dcc.Graph(
-                    id='g3',
+                    id='GD3',
                     figure=fig1[2]
                 )], className='graph'),
             
             html.Div(
                 [dcc.Graph(
-                    id='g4',
+                    id='GD4',
                     figure=fig1[3]
                 )], className='graph')
-        ])
+            ]
+        )
+    ])
+
+    return graph
+
+def graphBig():
+    graph = html.Div(style={'width':"100%"}, children=[
+        html.Div(
+            [html.Div(
+                [dcc.Graph(
+                    id='GB1',
+                    figure=fig[0]
+                )]),
+
+            ]
+        )
     ])
 
     return graph
