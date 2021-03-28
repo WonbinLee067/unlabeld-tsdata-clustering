@@ -23,7 +23,7 @@ import par_dtw as pDtw
 import core_components as cc
 from read_csv import csvDiv, parse_contents
 from text_data import textResultDiv
-from result_graph import graphDetail, graphCluster
+from result_graph import graphDetail, graphCluster, graphBig
 
 
 
@@ -190,8 +190,12 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [graphDetail()],
-                    className="pretty_container seven columns",
+                    #보기1
+                    #[graphDetail()],
+                    #className="pretty_container seven columns",
+                    #보기2
+                    [graphBig()],
+                    className="pretty_container seven columns fullgraph_class",
                 ),
                 html.Div(
                     [dcc.Graph(id="individual_graph")],
@@ -200,19 +204,19 @@ app.layout = html.Div(
             ],
             className="row flex-display ",
         ),
-        html.Div(
-            [
-                html.Div(
-                    [dcc.Graph(id="pie_graph")],
-                    className="pretty_container seven columns",
-                ),
-                html.Div(
-                    [dcc.Graph(id="aggregate_graph")],
-                    className="pretty_container five columns",
-                ),
-            ],
-            className="row flex-display",
-        ),
+        # html.Div(
+        #     [
+        #         html.Div(
+        #             [dcc.Graph(id="pie_graph")],
+        #             className="pretty_container seven columns",
+        #         ),
+        #         html.Div(
+        #             [dcc.Graph(id="aggregate_graph")],
+        #             className="pretty_container five columns",
+        #         ),
+        #     ],
+        #     className="row flex-display",
+        # ),
     ],
     id="mainContainer",
     style={"display": "flex", "flex-direction": "column"},
