@@ -91,19 +91,19 @@ def graphCluster():
                 [dcc.Graph(
                     id='GC1',
                     figure=fig[0]
-                )], className='graph'),
+                )], className='graph graph-hover'),
 
             html.Div(
                 [dcc.Graph(
                     id='GC2',
                     figure=fig[1]
-                )], className='graph'),
+                )], className='graph graph-hover'),
 
             html.Div(
                 [dcc.Graph(
                     id='GC3',
                     figure=fig[2]
-                )], className='graph'),
+                )], className='graph graph-hover'),
             
             ])
     ])
