@@ -143,7 +143,7 @@ def graphDetail():
     return graph
 
 def graphBig():
-    graph = html.Div(style={'width':"100%"}, children=[
+    graph = html.Div(style={}, children=[
         html.Div(
             [html.Div(
                 [dcc.Graph(

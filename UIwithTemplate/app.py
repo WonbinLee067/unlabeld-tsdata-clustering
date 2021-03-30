@@ -200,15 +200,20 @@ app.layout = html.Div(
                 # 세부적 결과 그래프 컴포넌트
                 html.Div(
                     id='detail-graph-output'
+                    
                 ),
-                # 세부적 결과 그래프 선택 조작 컴포넌트
-                ## 여기서 컴포넌트를 조작하여 위 세부적 결과 그래프 형태를 선택한다.
                 html.Div(
                     sd.detailGraphOption(),
-                    className="pretty_container five columns"
-                ),
+                    className=""
+                )
+                # # 세부적 결과 그래프 선택 조작 컴포넌트
+                # ## 여기서 컴포넌트를 조작하여 위 세부적 결과 그래프 형태를 선택한다.
+                # html.Div(
+                #     sd.detailGraphOption(),
+                #     className="pretty_container five columns"
+                # ),
             ],
-            className="row flex-display ",
+            className="pretty_container row flex-display",
         ),
         # html.Div(
         #     [
@@ -325,10 +330,10 @@ def update_parameter(n_clicks, detail_graph, num_graph):
     clsName = ''
     if detail_graph == 'GrDt':
         layout = graphDetail()
-        clsName = "pretty_container seven columns"
+        #clsName = "pretty_container seven columns"
     elif detail_graph == 'GrBg':
         layout = graphBig()
-        clsName = "pretty_container seven columns fullgraph_class"
+        clsName = "fullgraph_class"
     return layout, clsName
 
 # Main
