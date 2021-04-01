@@ -53,17 +53,23 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 
 GG = [
-    [[0,1,2,5,4,8],
-    [5,2,4,6,5,4,3,7],
-    [4,11,2,6,5,1,2,7],
-    [7,4,5,7,4,1]],
-    [[4,5,3,6,2],
-    [4,4,9,8,0,9],
-    [2,4,3,5,3,3,3,8],
-    [5,4,6,5,5,5]],
-    [[4,2,3,2,4,3,4],
-    [7,6,5,6,6,5,4],
-    [3,2,3,4,5,4]]
+    [ 
+        [0,1,2,5,4,8],
+        [5,2,4,6,5,4,3,7],
+        [4,11,2,6,5,1,2,7],
+        [7,4,5,7,4,1]
+    ],
+    [
+        [4,5,3,6,2],
+        [4,4,9,8,0,9],
+        [2,4,3,5,3,3,3,8],
+        [5,4,6,5,5,5]
+    ],
+    [
+        [4,2,3,2,4,3,4],
+        [7,6,5,6,6,5,4],
+        [3,2,3,4,5,4]
+    ]
 ]
 
 colors = {
@@ -71,78 +77,50 @@ colors = {
     'text': 'white'
 }
 
-fig=[]
-for i in range(0,len(GG)):
-    fig.append(makeGraph_Cluster(GG[i], 'teal'))
-    updateLayout(fig[i], 'cluster'+str(i))
-
-fig1=[]
-for i in range(0,len(GG[0])):
-    fig1.append(makeGraph_Detail(GG[0][i], 'firebrick'))
-    updateLayout(fig1[i], 'Cluster0_randomData'+str(i))
-
 
 
 def graphCluster():
-
+    figs=[]
+    for i in range(0,len(GG)):
+        figs.append(makeGraph_Cluster(GG[i], 'teal'))
+        updateLayout(figs[i], 'cluster'+str(i))
     graph = html.Div(style={ }, children=[
         html.Div(
             [html.Div(
-                [dcc.Graph(
-                    id='GC1',
-                    figure=fig[0]
-                )], className='graph graph-hover'),
-
-            html.Div(
-                [dcc.Graph(
-                    id='GC2',
-                    figure=fig[1]
-                )], className='graph graph-hover'),
-
-            html.Div(
-                [dcc.Graph(
-                    id='GC3',
-                    figure=fig[2]
-                )], className='graph graph-hover'),
-            
-            ])
-    ])
-
-    return graph
-
-def graphDetail():
-    graph = html.Div(style={'height': "500px"}, children=[
-        html.Div(
-            [html.Div(
-                [dcc.Graph(
-                    id='GD1',
-                    figure=fig1[0]
-                )], className='graph'),
-
-            html.Div(
-                [dcc.Graph(
-                    id='GD2',
-                    figure=fig1[1]
-                )], className='graph'),
-
-            html.Div(
-                [dcc.Graph(
-                    id='GD3',
-                    figure=fig1[2]
-                )], className='graph'),
-            
-            html.Div(
-                [dcc.Graph(
-                    id='GD4',
-                    figure=fig1[3]
-                )], className='graph')
+                dcc.Graph(id=f'GC{i}', figure=fig), 
+                className='graph graph-hover'
+                ) for i, fig in enumerate(figs)
             ]
         )
     ])
 
     return graph
 
-def graphBig():
+def graphDetail(nth_cluster):
+
+    global GG
+    figs=[]
+    for i in range(0,len(GG[nth_cluster])):
+        figs.append(makeGraph_Detail(GG[nth_cluster][i], 'firebrick'))
+        updateLayout(figs[i], 'Cluster0_randomData'+str(i))
+
+    graph = html.Div(style={'height': "500px"}, children=[
+        html.Div(
+            [html.Div(
+                dcc.Graph(id=f'GD{i}', figure=fig), 
+                className='graph'
+                ) for i, fig in enumerate(figs)
+            ]
+        )
+    ])
+    
+    return graph
+
+def graphBig(nth_cluster):
+    fig = []
+    fig.append(makeGraph_Cluster(GG[nth_cluster], 'teal'))
+    updateLayout(fig[0], 'cluster'+str(nth_cluster))
+
     graph = html.Div(style={}, children=[
         html.Div(
             [html.Div(
