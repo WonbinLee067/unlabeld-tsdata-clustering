@@ -11,9 +11,6 @@ from dash.dependencies import Input, Output, State, ClientsideFunction
 import dash_core_components as dcc
 import dash_html_components as html
 
-# Multi-dropdown options
-from controls import COUNTIES, WELL_STATUSES, WELL_TYPES, WELL_COLORS
-
 # Import for algorithm
 from params import ParameterDiv
 import main_algorithm as MA
@@ -37,21 +34,6 @@ app = dash.Dash(
     suppress_callback_exceptions=True
 )
 server = app.server
-
-# Create controls
-county_options = [
-    {"label": str(COUNTIES[county]), "value": str(county)} for county in COUNTIES
-]
-
-well_status_options = [
-    {"label": str(WELL_STATUSES[well_status]), "value": str(well_status)}
-    for well_status in WELL_STATUSES
-]
-
-well_type_options = [
-    {"label": str(WELL_TYPES[well_type]), "value": str(well_type)}
-    for well_type in WELL_TYPES
-]
 
 
 # Download pickle file
@@ -182,7 +164,7 @@ app.layout = html.Div(
                             ]),
                             html.Div([
                                 graphCluster()
-                            ])
+                            ], className = 'box-scroll')
                         ],
                             id="countGraphContainer",
                             className="pretty_container",
@@ -325,7 +307,7 @@ def update_parameter(n_clicks, detail_graph, num_graph):
     clsName = ''
     if detail_graph == 'GrDt':
         layout = graphDetail()
-        clsName = "pretty_container seven columns"
+        clsName = "pretty_container seven columns box-scroll"
     elif detail_graph == 'GrBg':
         layout = graphBig()
         clsName = "pretty_container seven columns fullgraph_class"
