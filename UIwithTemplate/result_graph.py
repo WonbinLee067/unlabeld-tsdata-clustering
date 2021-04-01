@@ -25,7 +25,7 @@ def makeGraph_Cluster(graph, color):
     
     fig = go.Figure()
     for i in range(0, len(graph)):
-        fig.add_trace(go.Scatter(y=graph[i],  line=dict(color=color)))
+        fig.add_trace(go.Scatter(y=graph[i],  line=dict(color=color), showlegend=False))
     return fig
     
 # figure: makeGraph()를 이용해 만든 그래프
@@ -33,7 +33,7 @@ def makeGraph_Cluster(graph, color):
 def updateLayout(figure, name, yaxis='value'):
     figure.update_layout(
         title=name,
-        yaxis_title=yaxis
+        yaxis_title=yaxis,
     )
 
 def makeGraph_Detail(graph, color):                    
@@ -111,7 +111,7 @@ def graphCluster():
     return graph
 
 def graphDetail():
-    graph = html.Div(style={ }, children=[
+    graph = html.Div(style={'height': "500px"}, children=[
         html.Div(
             [html.Div(
                 [dcc.Graph(
