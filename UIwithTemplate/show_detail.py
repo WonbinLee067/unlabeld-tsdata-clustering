@@ -4,7 +4,7 @@ from result_graph import num_clusters
 def detailGraphOption():
     return [
         html.Label("Choose cluster"),
-        cc.dropdown_layout("nth-cluster",
+        cc.radio_layout("nth-cluster", 
         [
             {'label': str(i+1), 'value': i}
             for i in range(num_clusters)
