@@ -303,12 +303,11 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     Output(component_id='detail-graph-output', component_property='children'),
     Output(component_id='detail-graph-output', component_property='className'),
     # my-input id 를 가진 컴포넌트의 value 속성을 가져온다.
-    Input('detail-graph-submit', 'n_clicks'),
-    State(component_id='nth-cluster', component_property='value'),
-    State(component_id='detail-graph-input', component_property='value'),
-    State(component_id='num-of-graphs', component_property='value')
+    Input(component_id='nth-cluster', component_property='value'),
+    Input(component_id='detail-graph-input', component_property='value'),
+    Input(component_id='num-of-graphs', component_property='value')
 )
-def update_parameter(n_clicks, nth_cluster, detail_graph, num_graph):
+def update_parameter(nth_cluster, detail_graph, num_graph):
     layout = []
     clsName = ''
     if detail_graph == 'GrDt':
