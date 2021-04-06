@@ -103,11 +103,9 @@ def graphCluster():
 
     return graph
 
-def graphDetail(nth_cluster):
-
-    global GG
+def graphDetail(nth_cluster, num_graph):
     figs=[]
-    for i in range(0,len(GG[nth_cluster])):
+    for i in range(0, num_graph):
         figs.append(makeGraph_Detail(GG[nth_cluster][i], 'firebrick'))
         updateLayout(figs[i], 'Cluster0_randomData'+str(i))
 
@@ -123,9 +121,9 @@ def graphDetail(nth_cluster):
     
     return graph
 
-def graphBig(nth_cluster):
+def graphBig(nth_cluster, num_graph):
     fig = []
-    fig.append(makeGraph_Cluster(GG[nth_cluster], 'teal'))
+    fig.append(makeGraph_Cluster(GG[nth_cluster][:num_graph], 'teal'))
     updateLayout(fig[0], 'cluster'+str(nth_cluster))
 
     graph = html.Div(style={}, children=[
