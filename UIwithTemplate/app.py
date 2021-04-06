@@ -21,6 +21,7 @@ import core_components as cc
 from read_csv import csvDiv, parse_contents
 from text_data import textResultDiv
 from result_graph import graphDetail, graphCluster, graphBig
+from result_graph import GG
 import show_detail as sd
 
 
@@ -302,21 +303,30 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     # my-output id를 가진 컴포넌트의 children 속성으로 들어간다.
     Output(component_id='detail-graph-output', component_property='children'),
     Output(component_id='detail-graph-output', component_property='className'),
+    Output(component_id='num-of-graphs', component_property='max'),
+    Output(component_id='num-of-graphs', component_property='value'),
+    Output(component_id='label-n-graphs', component_property='children'),
     # my-input id 를 가진 컴포넌트의 value 속성을 가져온다.
+    # Input('detail-graph-submit', 'n_clicks'),
     Input(component_id='nth-cluster', component_property='value'),
     Input(component_id='detail-graph-input', component_property='value'),
     Input(component_id='num-of-graphs', component_property='value')
 )
-def update_parameter(nth_cluster, detail_graph, num_graph):
+def update_parameter( nth_cluster, detail_graph, num_graph):
     layout = []
     clsName = ''
+    nMaxGraphs = len(GG[nth_cluster])
+    if num_graph > nMaxGraphs:
+        num_graph = nMaxGraphs
     if detail_graph == 'GrDt':
-        layout = graphDetail(nth_cluster)
+        layout = graphDetail(nth_cluster, num_graph)
         clsName = "box-scroll"
     elif detail_graph == 'GrBg':
-        layout = graphBig(nth_cluster)
+        layout = graphBig(nth_cluster, num_graph)
         clsName = "fullgraph_class"
-    return layout, clsName
+    #최대 그래프 개수
+    
+    return layout, clsName, nMaxGraphs, num_graph, f"Number of data graphs per clusters (max: {nMaxGraphs})"
 
 # Main
 if __name__ == "__main__":
