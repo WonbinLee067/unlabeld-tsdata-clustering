@@ -572,7 +572,18 @@ there.
   .container-display {
     display: flex;
   }
+  #wells,
+  #gas,
+  #oil {
+    margin-right: 10px;
+  }
 
+  #wells {
+    margin-left: 0px;
+  }
+  #water {
+    margin-right: 0px;
+  }
   .mini_container {
     margin-bottom: 25px !important;
     border-radius: 5px;
@@ -580,7 +591,6 @@ there.
     padding: 15px;
     position: relative;
     box-shadow: 2px 2px 2px lightgrey;
- 
   }
   #plotly-image {
     margin-bottom: 0px !important;
@@ -625,7 +635,6 @@ there.
     display: inline-block;
     width:30%;
     padding: 10px;
-
   
 }
 .graph-hover:hover{
@@ -640,7 +649,7 @@ there.
   padding: 10px;
   animation: fadein 3s;
   -moz-animation: fadein 3s; /* Firefox */
-  -webkit-animation: fadein 3s; /* Safari and Chrome */
+  -webkit-animation: fadein 10s; /* Safari and Chrome */
   -o-animation: fadein 3s; /* Opera */
 
 }
@@ -726,13 +735,4 @@ there.
   animation: fadeIn 1s
 }
 
-.marginleft{
-  margin-left: 4%;
-}
-.floatright{
-  float: right;
-}
 
-#detail-graph-output{
-  width: 100%;
-}
