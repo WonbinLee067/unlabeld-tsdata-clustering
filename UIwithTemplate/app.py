@@ -36,6 +36,28 @@ app = dash.Dash(
 )
 server = app.server
 
+
+# Download pickle file
+urllib.request.urlretrieve(
+    "https://raw.githubusercontent.com/plotly/datasets/master/dash-sample-apps/dash-oil-and-gas/data/points.pkl",
+    DATA_PATH.joinpath("points.pkl"),
+)
+points = pickle.load(open(DATA_PATH.joinpath("points.pkl"), "rb"))
+
+
+# Load data
+df = pd.read_csv(
+    "https://github.com/plotly/datasets/raw/master/dash-sample-apps/dash-oil-and-gas/data/wellspublic.csv",
+    low_memory=False,
+)
+df["Date_Well_Completed"] = pd.to_datetime(df["Date_Well_Completed"])
+df = df[df["Date_Well_Completed"] > dt.datetime(1960, 1, 1)]
+
+trim = df[["API_WellNo", "Well_Type", "Well_Name"]]
+trim.index = trim["API_WellNo"]
+dataset = trim.to_dict(orient="index")
+
+
 # Create global chart template
 mapbox_access_token = "pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG50amg0dnJieG4ifQ.Zme1-Uzoi75IaFbieBDl3A"
 
@@ -129,6 +151,7 @@ app.layout = html.Div(
                             [
                                 html.Div(
                                     [csvDiv()],
+                                    id="wells",
                                     className="mini_container",
                                 )
                             ],
@@ -160,10 +183,11 @@ app.layout = html.Div(
                 # 세부적 결과 그래프 컴포넌트
                 html.Div(
                     id='detail-graph-output'
+                    
                 ),
                 html.Div(
                     sd.detailGraphOption(),
-                    className = "floatright"
+                    className=""
                 )
                 # # 세부적 결과 그래프 선택 조작 컴포넌트
                 # ## 여기서 컴포넌트를 조작하여 위 세부적 결과 그래프 형태를 선택한다.
@@ -172,7 +196,7 @@ app.layout = html.Div(
                 #     className="pretty_container five columns"
                 # ),
             ],
-            className="pretty_container row flex-display marginleft",
+            className="pretty_container row flex-display",
         ),
         # html.Div(
         #     [
