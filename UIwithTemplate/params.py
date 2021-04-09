@@ -14,7 +14,7 @@ import pandas as pd
 
 ddlay_algo = cc.tab_layout('algorithm', 'CNAE', {
         'CNN AutoEncoder':'CNAE',
-        'TimeSeriesKmeans': 'TSKM',
+        'TimeSeries Kmeans': 'TSKM',
         'LSTM AutoEncoder': 'LSAE'
         })
     
