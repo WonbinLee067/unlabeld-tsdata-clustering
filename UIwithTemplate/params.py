@@ -12,21 +12,20 @@ import pandas as pd
 # see https://plotly.com/python/px-arguments/ for more options
 
 
-ddlay_algo = cc.tab_layout('algorithm', 'CNAE', {
-        'CNN AutoEncoder':'CNAE',
-        'TimeSeries Kmeans': 'TSKM',
-        'LSTM AutoEncoder': 'LSAE'
-        })
-    
 def ParameterDiv():
     param_layout = html.Div([
+        dcc.Store(id="store-main-algorithm", data=[]),
         html.H6("change the value in the text box to see callbacks in action!"),
         html.Div([
             "Algorithms: ",
-            ddlay_algo
+            cc.tab_layout('algorithm', 'CNAE', {
+                'CNN AutoEncoder':'CNAE',
+                'TimeSeriesKmeans': 'TSKM',
+                'LSTM AutoEncoder': 'LSAE'
+            })
         ]),
         html.Br(),
-        html.Div(id='my-output'),
+        html.Div(id='parma-for-main-algorithm'),
     ])
     return param_layout
 
