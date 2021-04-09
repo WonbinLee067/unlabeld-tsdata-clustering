@@ -80,7 +80,7 @@ body {
   align-items: center;
 }
 
-#learn-more-button {
+#learn-button {
   text-align: center;
   height: 100%;
   padding: 0 20px;
@@ -142,4 +142,3 @@ body {
   pointer-events: all;
   transform: translate(30px, 349px);
 }
-
