@@ -129,7 +129,7 @@ app.layout = html.Div(
                             [
                                 html.Div(
                                     [csvDiv()],
-                                    className="mini_container",
+                                    className="mini_container full",
                                 )
                             ],
                             id="info-container",

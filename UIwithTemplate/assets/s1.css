@@ -80,7 +80,7 @@
     width: 22%;
   }
   .four.columns {
-    width: 30.6666666667%;
+    width: 20.6666666667%;
   }
   .five.columns {
     width: 39.3333333333%;
@@ -92,7 +92,7 @@
     width: 96%;
   }
   .eight.columns {
-    width: 65.3333333333%;
+    width: 75.3333333333%;
   }
   .nine.columns {
     width: 74%;
@@ -542,7 +542,7 @@ there.
     width: 22%;
   }
   .four.columns {
-    width: calc(100% / 3);
+    width: calc(100% / 4);
   }
   .five.columns {
     width: calc(100% * 5 / 12);
@@ -731,8 +731,35 @@ there.
 }
 .floatright{
   float: right;
+  margin: 10px;
 }
 
-#detail-graph-output{
+#detail-graph-output,
+.full{
   width: 100%;
+}
+
+/* Parameter css */
+.dash-dropdown,
+#number-of-cluster,
+#learning-rate,
+#try_n_init,
+#try_n_kmeans,
+#image-data-type,
+#dimension,
+#time-delay,
+#percentage{
+  width: 70%;
+}
+
+#algorithm > div{
+  padding:3%;
+  text-align: left;
+}
+
+#cross-filter-options>div>div>div>div{
+  padding:1%;
+}
+#random_center{
+  text-align: left;
 }
