@@ -25,6 +25,13 @@ from result_graph import GG
 import show_detail as sd
 
 
+
+import numpy as np
+from readFile import split_into_values, toRPdata
+from tslearn.preprocessing import TimeSeriesScalerMeanVariance, TimeSeriesResampler
+from sklearn.preprocessing import MinMaxScaler
+from utils import split_data, normalization_tool
+from agent import Autoencoder_Agent
 app = dash.Dash(
     __name__,
     meta_tags=[{"name": "viewport", "content": "width=device-width"}],
@@ -147,6 +154,10 @@ app.layout = html.Div(
     style={"display": "flex", "flex-direction": "column"},
 )
 
+def MinMax(data):
+    MMS = MinMaxScaler().fit(data)
+    scaled = MMS.transform(data)
+    return scaled
 
 ####                                                           ####
 # Main Algorithm 에 대한 Layout을 제공해 줍니다. MA: Main Algorithm #
@@ -350,19 +361,51 @@ def get_store_data(n_clicks, ma_data, cnn_data, km_data, rp_data):
     print(km_data)
     print(rp_data)
     # RP -> CNN -> KMenas알고리즘 적용
+
+    df = pd.read_csv('../resources/testdata.csv')
+    columns = ['chip', 'wire', 'segment']
+    value = ['value']
+    #df = pd.read_csv('resources/Dataset1.csv')
+    #columns = ['Process', 'Step']
+    #value = ['Value']
+
+    df = df.loc[:, columns + value] #('chip', 'wire', 'value')는 사용자 입력
+    size = 28
+    result = split_into_values(df, columns)
+    result_ = TimeSeriesResampler(sz=size).fit_transform(result)
+    data = result_.reshape(result_.shape[0], 1, size)
+    if cnn_data[0]['img-data-type'] == 'RP':
+        X = toRPdata(data)
+        X_scaled = np.empty((X.shape[0], size, size))
+        for i, data in enumerate(X):
+            X_scaled[i] = MinMax(data)
+        X_scaled = np.expand_dims(X_scaled, axis=3)
+    if ma_data[0]['main_algorithm'] == 'CNAE':    
+        batch_size = cnn_data[0]['batch_size']
+        learning_rate = 0.01
+        #learning_rate = cnn_data[0]['learning_rate']
+        epochs = 5
+        optimizer='Adam'
+        loss='binary_crossentropy'
+        X_train, X_test, Y_train, Y_test = split_data(X_scaled, X_scaled) #데이터 분리
+
+        agent_28 = Autoencoder_Agent(28,optimizer,learning_rate)
+        agent_28.train(X_train,batch_size,epochs,X_test)
+        feature = agent_28.feature_extract(X_train)
+        print(feature)
     return []
 
-@app.callback(
-    Output("hidden-tsk-div", "children"),
-    Input("learn-button", "n_clicks"),
-    State("store-main-algorithm", "data"),
-    State("store-distance-algorithm", 'data'),
-    prevent_initial_call=True
-)
-def get_store_data(n_clicks, ma_data, dis_data):
-    print(ma_data)
-    print(dis_data)
-    return []
+# @app.callback(
+#     Output("hidden-tsk-div", "children"),
+#     Input("learn-button", "n_clicks"),
+#     State("store-main-algorithm", "data"),
+#     State("store-distance-algorithm", 'data'),
+#     prevent_initial_call=True
+# )
+# def get_store_data(n_clicks, ma_data, dis_data):
+#     print(ma_data)
+#     print(dis_data)
+#     return []
 # 학습 버튼을 클릭 하게 되면, i
 # Main
 if __name__ == "__main__":
