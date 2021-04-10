@@ -25,58 +25,13 @@ from result_graph import GG
 import show_detail as sd
 
 
-# get relative data folder
-PATH = pathlib.Path(__file__).parent
-DATA_PATH = PATH.joinpath("data").resolve()
-
 app = dash.Dash(
-    __name__, 
+    __name__,
     meta_tags=[{"name": "viewport", "content": "width=device-width"}],
     suppress_callback_exceptions=True
 )
 server = app.server
 
-
-# Download pickle file
-urllib.request.urlretrieve(
-    "https://raw.githubusercontent.com/plotly/datasets/master/dash-sample-apps/dash-oil-and-gas/data/points.pkl",
-    DATA_PATH.joinpath("points.pkl"),
-)
-points = pickle.load(open(DATA_PATH.joinpath("points.pkl"), "rb"))
-
-
-# Load data
-df = pd.read_csv(
-    "https://github.com/plotly/datasets/raw/master/dash-sample-apps/dash-oil-and-gas/data/wellspublic.csv",
-    low_memory=False,
-)
-df["Date_Well_Completed"] = pd.to_datetime(df["Date_Well_Completed"])
-df = df[df["Date_Well_Completed"] > dt.datetime(1960, 1, 1)]
-
-trim = df[["API_WellNo", "Well_Type", "Well_Name"]]
-trim.index = trim["API_WellNo"]
-dataset = trim.to_dict(orient="index")
-
-
-# Create global chart template
-mapbox_access_token = "pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG50amg0dnJieG4ifQ.Zme1-Uzoi75IaFbieBDl3A"
-
-layout = dict(
-    autosize=True,
-    automargin=True,
-    margin=dict(l=30, r=30, b=20, t=40),
-    hovermode="closest",
-    plot_bgcolor="#F9F9F9",
-    paper_bgcolor="#F9F9F9",
-    legend=dict(font=dict(size=10), orientation="h"),
-    title="Satellite Overview",
-    mapbox=dict(
-        accesstoken=mapbox_access_token,
-        style="light",
-        center=dict(lon=-78.05, lat=42.54),
-        zoom=7,
-    ),
-)
 
 # Create app layout
 app.layout = html.Div(
@@ -119,10 +74,7 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     [
-                        html.A(
-                            html.Button("Learn More", id="learn-more-button"),
-                            href="https://plot.ly/dash/pricing/",
-                        )
+                        html.Button("학습 시작하기", id="learn-button")
                     ],
                     className="one-third column",
                     id="button",
@@ -151,8 +103,7 @@ app.layout = html.Div(
                             [
                                 html.Div(
                                     [csvDiv()],
-                                    id="wells",
-                                    className="mini_container",
+                                    className="mini_container full",
                                 )
                             ],
                             id="info-container",
@@ -183,34 +134,14 @@ app.layout = html.Div(
                 # 세부적 결과 그래프 컴포넌트
                 html.Div(
                     id='detail-graph-output'
-                    
                 ),
                 html.Div(
                     sd.detailGraphOption(),
-                    className=""
+                    className = "floatright"
                 )
-                # # 세부적 결과 그래프 선택 조작 컴포넌트
-                # ## 여기서 컴포넌트를 조작하여 위 세부적 결과 그래프 형태를 선택한다.
-                # html.Div(
-                #     sd.detailGraphOption(),
-                #     className="pretty_container five columns"
-                # ),
             ],
-            className="pretty_container row flex-display",
+            className="pretty_container row flex-display marginleft",
         ),
-        # html.Div(
-        #     [
-        #         html.Div(
-        #             [dcc.Graph(id="pie_graph")],
-        #             className="pretty_container seven columns",
-        #         ),
-        #         html.Div(
-        #             [dcc.Graph(id="aggregate_graph")],
-        #             className="pretty_container five columns",
-        #         ),
-        #     ],
-        #     className="row flex-display",
-        # ),
     ],
     id="mainContainer",
     style={"display": "flex", "flex-direction": "column"},
@@ -222,7 +153,7 @@ app.layout = html.Div(
 ####                                                           ####
 @app.callback(
     # my-output id를 가진 컴포넌트의 children 속성으로 들어간다.
-    Output(component_id='my-output', component_property='children'),
+    Output(component_id='parma-for-main-algorithm', component_property='children'),
     # my-input id 를 가진 컴포넌트의 value 속성을 가져온다.
     Input(component_id='algorithm', component_property='value')
 )
@@ -264,7 +195,7 @@ def image_data_param(data_type):
     params = []
     if data_type == 'RP':
         params = pid.recurrence_plot()
-    elif data_type == 'RAW': 
+    elif data_type == 'RAW':
         params = pid.raw_img()
     return params
 
@@ -279,7 +210,7 @@ def image_data_param(data_type):
     params = []
     if data_type == 'DTW':
         params = pDtw.dtw()
-    elif data_type == 'SDT': 
+    elif data_type == 'SDT':
         params = pDtw.soft_dtw()
     return params
 
@@ -288,13 +219,13 @@ def image_data_param(data_type):
 @app.callback(Output('output-data-upload', 'children'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
-              State('upload-data', 'last_modified'))             
+              State('upload-data', 'last_modified'))
 def update_output(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
         children = [
             parse_contents(c, n, d) for c, n, d in
             zip(list_of_contents, list_of_names, list_of_dates)]
-        return children    
+        return children
 
 ####                                                           ####
 # 컨트롤 컴포넌트에 의해 세부적 그래프 컴포넌트가 달라집니다. #
@@ -316,7 +247,7 @@ def update_parameter( nth_cluster, detail_graph, num_graph):
     layout = []
     clsName = ''
     nMaxGraphs = len(GG[nth_cluster])
-    if num_graph > nMaxGraphs:
+    if num_graph is None or num_graph > nMaxGraphs:
         num_graph = nMaxGraphs
     if detail_graph == 'GrDt':
         layout = graphDetail(nth_cluster, num_graph)
@@ -325,9 +256,114 @@ def update_parameter( nth_cluster, detail_graph, num_graph):
         layout = graphBig(nth_cluster, num_graph)
         clsName = "fullgraph_class"
     #최대 그래프 개수
-    
+
     return layout, clsName, nMaxGraphs, num_graph, f"Number of data graphs per clusters (max: {nMaxGraphs})"
 
+# Store에 data를 담는다.
+@app.callback(
+    Output("store-main-algorithm", "data"),
+    Input("algorithm", "value"),
+)
+def store_parameter(ma):
+    df = pd.DataFrame()
+    df['main_algorithm'] = [ma]
+    data = df.to_dict('records')
+    return data
+
+# CNN 관련 parameter
+@app.callback(
+    Output('store-cnn-param', 'data'),
+    Input("batch-size", "value"),
+    Input("learning-rate", "value"),
+    Input("cluster-algorithm", "value"),
+    Input("img-data-type", "value"),
+)
+def store_cnn_param(bs, lr, clag, imgdt):
+    df = pd.DataFrame()
+    df['batch_size'] = [bs]
+    df['learning_rate'] = [lr]
+    df['cluster_algorithm'] = [clag]
+    df['img-data-type'] = [imgdt]
+    data = df.to_dict('records')
+    return data
+
+# KMeans 관련 Parameter
+@app.callback(
+    Output('store-kmeans-param', 'data'),
+    Input("number-of-cluster", "value"),
+    Input("tolerance", "value"),
+    Input("try-n-init", "value"),
+    Input("try-n-kmeans", "value"),
+    Input("random-center", "value"),
+)
+def store_kmeans_param(ncl, tol, tni, tnk, rc):
+    df = pd.DataFrame()
+    df['number_of_cluster'] = [ncl]
+    df['tolerance'] = [tol]
+    df['try_n_init'] = [tni]
+    df['try_n_kmeans'] = [tnk]
+    df['random_center'] = [rc]
+    data = df.to_dict('records')
+    return data
+
+# Image Data(RP) 관련 Parameter
+@app.callback(
+    Output('store-rp-param', 'data'),
+    Input("dimension", "value"),
+    Input("time-delay", "value"),
+    Input("threshold", "value"),
+    Input("percentage", "value"),
+)
+def store_rp_param(dim, td, th, prtg):
+    df = pd.DataFrame()
+    df['dimension'] = [dim]
+    df['time_delay'] = [td]
+    df['threshold'] = [th]
+    df['percentage'] = [prtg]
+    data = df.to_dict('records')
+    return data
+
+# Time Series Kmeans 관련 parameter
+@app.callback(
+    Output('store-distance-algorithm', 'data'),
+    Input('distance-algorithm', "value"),
+)
+def store_cnn_param(dsag):
+    df = pd.DataFrame()
+    df['distance-alogrithm'] = [dsag]
+    data = df.to_dict('records')
+    return data
+
+# CNN 관련 알고리즘 실행!
+@app.callback(
+    Output("hidden-cnn-div", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-main-algorithm", "data"),
+    State("store-cnn-param", 'data'),
+    State("store-kmeans-param", 'data'),
+    State("store-rp-param", 'data'),
+    prevent_initial_call=True
+)
+def get_store_data(n_clicks, ma_data, cnn_data, km_data, rp_data):
+    print(ma_data)
+    print(cnn_data)
+    print(km_data)
+    print(rp_data)
+    # RP -> CNN -> KMenas알고리즘 적용
+    return []
+
+@app.callback(
+    Output("hidden-tsk-div", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-main-algorithm", "data"),
+    State("store-distance-algorithm", 'data'),
+    prevent_initial_call=True
+)
+def get_store_data(n_clicks, ma_data, dis_data):
+    print(ma_data)
+    print(dis_data)
+    return []
+# 학습 버튼을 클릭 하게 되면, i
 # Main
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=True, threaded=True)

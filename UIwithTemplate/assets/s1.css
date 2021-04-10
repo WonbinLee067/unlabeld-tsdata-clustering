@@ -80,7 +80,7 @@
     width: 22%;
   }
   .four.columns {
-    width: 30.6666666667%;
+    width: 20.6666666667%;
   }
   .five.columns {
     width: 39.3333333333%;
@@ -92,7 +92,7 @@
     width: 96%;
   }
   .eight.columns {
-    width: 65.3333333333%;
+    width: 75.3333333333%;
   }
   .nine.columns {
     width: 74%;
@@ -542,7 +542,7 @@ there.
     width: 22%;
   }
   .four.columns {
-    width: calc(100% / 3);
+    width: calc(100% / 4);
   }
   .five.columns {
     width: calc(100% * 5 / 12);
@@ -572,18 +572,7 @@ there.
   .container-display {
     display: flex;
   }
-  #wells,
-  #gas,
-  #oil {
-    margin-right: 10px;
-  }
 
-  #wells {
-    margin-left: 0px;
-  }
-  #water {
-    margin-right: 0px;
-  }
   .mini_container {
     margin-bottom: 25px !important;
     border-radius: 5px;
@@ -591,6 +580,7 @@ there.
     padding: 15px;
     position: relative;
     box-shadow: 2px 2px 2px lightgrey;
+ 
   }
   #plotly-image {
     margin-bottom: 0px !important;
@@ -635,6 +625,7 @@ there.
     display: inline-block;
     width:30%;
     padding: 10px;
+
   
 }
 .graph-hover:hover{
@@ -649,7 +640,7 @@ there.
   padding: 10px;
   animation: fadein 3s;
   -moz-animation: fadein 3s; /* Firefox */
-  -webkit-animation: fadein 10s; /* Safari and Chrome */
+  -webkit-animation: fadein 3s; /* Safari and Chrome */
   -o-animation: fadein 3s; /* Opera */
 
 }
@@ -735,4 +726,40 @@ there.
   animation: fadeIn 1s
 }
 
+.marginleft{
+  margin-left: 4%;
+}
+.floatright{
+  float: right;
+  margin: 10px;
+}
 
+#detail-graph-output,
+.full{
+  width: 100%;
+}
+
+/* Parameter css */
+.dash-dropdown,
+#number-of-cluster,
+#learning-rate,
+#try_n_init,
+#try_n_kmeans,
+#image-data-type,
+#dimension,
+#time-delay,
+#percentage{
+  width: 70%;
+}
+
+#algorithm > div{
+  padding:3%;
+  text-align: left;
+}
+
+#cross-filter-options>div>div>div>div{
+  padding:1%;
+}
+#random_center{
+  text-align: left;
+}
