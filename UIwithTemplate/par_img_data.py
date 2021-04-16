@@ -5,7 +5,6 @@ import core_components as cc
 
 def recurrence_plot():
     params = html.Div([
-            html.Div(id='hidden-rp-div', style={'display':'none'}),
             dcc.Store(id='store-rp-param', data=[]),
             html.H4("RP Parameters"),
             html.H6("Dimension"),
@@ -14,7 +13,7 @@ def recurrence_plot():
 
             html.H6("Time-Delay"),
             html.Label("공간 궤적 좌표 생성시 사용되는 기존 좌표 데이터의 시간 차이를 뜻한다. 따라서 1dim 데이터 사용시 큰 의미가 없다."),
-            cc.num_input_layout('time-delay', init_value=1, min=1, placeholder="dimension"),
+            cc.num_input_layout('time-delay', init_value=1, min=1, placeholder="time delay"),
 
             html.H6("Threshold"),
             html.Label("궤적의 거리 최솟값을 설정한다."),
@@ -32,6 +31,8 @@ def recurrence_plot():
 
 def raw_img():
     params = html.Div([
-            html.H4("RAW Data Preprocessing")
+            dcc.Store(id='store-raw-img-param', data=[]),
+            html.H4("RAW Data Preprocessing"),
+            cc.num_input_layout('raw-img-sample', init_value=1, min=1, placeholder="sample"),
         ])
     return params

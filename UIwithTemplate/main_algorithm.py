@@ -7,21 +7,21 @@ def cnn_autoencoder():
             html.Div(id='hidden-cnn-div', style={'display':'none'}),
             dcc.Store(id='store-cnn-param', data=[]),
             html.Label('Batch Size'),
-            cc.radio_layout('batch-size', [
+            cc.radio_layout('autoencoder-batch-size', [
                 {'label': '32', 'value':32},
                 {'label': '64', 'value':64}
             ], 32),
             html.Label('learning rate'),
-            cc.slider_layout('learning-rate', 1, 3, marks={i: '{}'.format(i) if i == 1 else str(i) for i in range(1, 4)}),
+            cc.slider_layout('autoencoder-learning-rate', 1, 3, marks={i: '{}'.format(i) if i == 1 else str(i) for i in range(1, 4)}),
 
             html.Label('Clustering Algorithm'),
-            cc.dropdown_layout('cluster-algorithm', [
+            cc.dropdown_layout('after-autoencoder-cluster-algorithm', [
                 {'label': 'KMeans', 'value': 'KMS'},
                 {'label': 'DBSCAN', 'value': 'DBS'}
             ], 'KMS'),
             html.Div(id='param-for-cluster-algorithm'),
             html.Label('Image Data Type'),
-            cc.dropdown_layout('img-data-type',
+            cc.dropdown_layout('before-autoencoder-img-data-type',
                 [
                     {'label': 'Recurrence Plot', 'value':'RP'},
                     {'label': 'Raw Data', 'value' : 'RAW'}

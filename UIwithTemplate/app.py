@@ -159,6 +159,13 @@ def MinMax(data):
     scaled = MMS.transform(data)
     return scaled
 
+# 중요! ################################################
+## 지금 상황으로는 파라미터 적용을 할수가 없음 로직을 바꾸어야 한다.
+## 알고리즘을 애초에 먼저 선택 
+## -> 해당 알고리즘에 대한 파라미터 나열
+## -> 알고리즘 예) Rp+autoencoder+kmeans, RP+autoencoder+DBSCAN
+## ,RawImg+autoencoder+Kmeans + ...ㅋㅋㅋ###########
+
 ####                                                           ####
 # Main Algorithm 에 대한 Layout을 제공해 줍니다. MA: Main Algorithm #
 ####                                                           ####
@@ -184,7 +191,7 @@ def update_parameter(input_value):
 ####                                              ####
 @app.callback(
     Output('param-for-cluster-algorithm', 'children'),
-    Input('cluster-algorithm', 'value')
+    Input('after-autoencoder-cluster-algorithm', 'value')
 )
 def clister_algorithm_param(cluster):
     params = []
@@ -200,7 +207,7 @@ def clister_algorithm_param(cluster):
 ####                                                           ####
 @app.callback(
     Output(component_id='param-for-img-data', component_property='children'),
-    Input(component_id='img-data-type', component_property='value')
+    Input(component_id='before-autoencoder-img-data-type', component_property='value')
 )
 def image_data_param(data_type):
     params = []
@@ -284,10 +291,10 @@ def store_parameter(ma):
 # CNN 관련 parameter
 @app.callback(
     Output('store-cnn-param', 'data'),
-    Input("batch-size", "value"),
-    Input("learning-rate", "value"),
-    Input("cluster-algorithm", "value"),
-    Input("img-data-type", "value"),
+    Input("autoencoder-batch-size", "value"),
+    Input("autoencoder-learning-rate", "value"),
+    Input("after-autoencoder-cluster-algorithm", "value"),
+    Input("before-autoencoder-img-data-type", "value"),
 )
 def store_cnn_param(bs, lr, clag, imgdt):
     df = pd.DataFrame()
@@ -299,6 +306,7 @@ def store_cnn_param(bs, lr, clag, imgdt):
     return data
 
 # KMeans 관련 Parameter
+# KMeans 경우 여러 곳에서 사용이 가능 할 것이므로!, 공통된 id 이름을 사용
 @app.callback(
     Output('store-kmeans-param', 'data'),
     Input("number-of-cluster", "value"),
@@ -334,7 +342,18 @@ def store_rp_param(dim, td, th, prtg):
     data = df.to_dict('records')
     return data
 
+# Raw Image 관련 Parameter
+@app.callback(
+    Output('store-raw-img-param', 'data'),
+    Input('raw-img-sample', 'value')
+)
+def store_raw_img_param(sample):
+    df = pd.DataFrame()
+    df['sample'] = [sample]
+    data = df.to_dict('records')
+    return data
 # Time Series Kmeans 관련 parameter
+# 두 id가 동시에 나오면 상관 없다.
 @app.callback(
     Output('store-distance-algorithm', 'data'),
     Input('distance-algorithm', "value"),
@@ -345,6 +364,9 @@ def store_cnn_param(dsag):
     data = df.to_dict('records')
     return data
 
+#######################################################
+# 각 알고리즘마다 콜백을 실행하자!
+# 실행에만 prevent_initial_call=True 하면된다.
 # CNN 관련 알고리즘 실행!
 @app.callback(
     Output("hidden-cnn-div", "children"),
@@ -355,57 +377,68 @@ def store_cnn_param(dsag):
     State("store-rp-param", 'data'),
     prevent_initial_call=True
 )
-def get_store_data(n_clicks, ma_data, cnn_data, km_data, rp_data):
+def exct_rp_autoencoder_kmeans(n_clicks, ma_data, cnn_data, km_data, rp_data):
     print(ma_data)
     print(cnn_data)
     print(km_data)
     print(rp_data)
     # RP -> CNN -> KMenas알고리즘 적용
 
-    df = pd.read_csv('../resources/testdata.csv')
-    columns = ['chip', 'wire', 'segment']
-    value = ['value']
-    #df = pd.read_csv('resources/Dataset1.csv')
-    #columns = ['Process', 'Step']
-    #value = ['Value']
+    # df = pd.read_csv('../resources/testdata.csv')
+    # columns = ['chip', 'wire', 'segment']
+    # value = ['value']
+    # #df = pd.read_csv('resources/Dataset1.csv')
+    # #columns = ['Process', 'Step']
+    # #value = ['Value']
 
-    df = df.loc[:, columns + value] #('chip', 'wire', 'value')는 사용자 입력
-    size = 28
-    result = split_into_values(df, columns)
-    result_ = TimeSeriesResampler(sz=size).fit_transform(result)
-    data = result_.reshape(result_.shape[0], 1, size)
-    if cnn_data[0]['img-data-type'] == 'RP':
-        X = toRPdata(data)
-        X_scaled = np.empty((X.shape[0], size, size))
-        for i, data in enumerate(X):
-            X_scaled[i] = MinMax(data)
-        X_scaled = np.expand_dims(X_scaled, axis=3)
-    if ma_data[0]['main_algorithm'] == 'CNAE':    
-        batch_size = cnn_data[0]['batch_size']
-        learning_rate = 0.01
-        #learning_rate = cnn_data[0]['learning_rate']
-        epochs = 5
-        optimizer='Adam'
-        loss='binary_crossentropy'
-        X_train, X_test, Y_train, Y_test = split_data(X_scaled, X_scaled) #데이터 분리
+    # df = df.loc[:, columns + value] #('chip', 'wire', 'value')는 사용자 입력
+    # size = 28
+    # result = split_into_values(df, columns)
+    # result_ = TimeSeriesResampler(sz=size).fit_transform(result)
+    # data = result_.reshape(result_.shape[0], 1, size)
+    # if cnn_data[0]['before-autoencoder-img-data-type'] == 'RP':
+    #     X = toRPdata(data)
+    #     X_scaled = np.empty((X.shape[0], size, size))
+    #     for i, data in enumerate(X):
+    #         X_scaled[i] = MinMax(data)
+    #     X_scaled = np.expand_dims(X_scaled, axis=3)
+    # if ma_data[0]['main_algorithm'] == 'CNAE':    
+    #     batch_size = cnn_data[0]['batch_size']
+    #     learning_rate = 0.01
+    #     #learning_rate = cnn_data[0]['learning_rate']
+    #     epochs = 5
+    #     optimizer='Adam'
+    #     loss='binary_crossentropy'
+    #     X_train, X_test, Y_train, Y_test = split_data(X_scaled, X_scaled) #데이터 분리
 
-        agent_28 = Autoencoder_Agent(28,optimizer,learning_rate)
-        agent_28.train(X_train,batch_size,epochs,X_test)
-        feature = agent_28.feature_extract(X_train)
-        print(feature)
+    #     agent_28 = Autoencoder_Agent(28,optimizer,learning_rate)
+    #     agent_28.train(X_train,batch_size,epochs,X_test)
+    #     feature = agent_28.feature_extract(X_train)
+    #     print(feature)
+    return []
+@app.callback(
+    Output("hidden-cnn-div", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-main-algorithm", "data"),
+    State("store-cnn-param", 'data'),
+    State("store-kmeans-param", 'data'),
+    State("store-raw-img-param", 'data'),
+    prevent_initial_call=True
+)
+def exct_raw_autoencoder_kmeans(n_clicks, ma_data, cnn_data, km_data, raw_img_data):
     return []
 
-# @app.callback(
-#     Output("hidden-tsk-div", "children"),
-#     Input("learn-button", "n_clicks"),
-#     State("store-main-algorithm", "data"),
-#     State("store-distance-algorithm", 'data'),
-#     prevent_initial_call=True
-# )
-# def get_store_data(n_clicks, ma_data, dis_data):
-#     print(ma_data)
-#     print(dis_data)
-#     return []
+@app.callback(
+    Output("hidden-tsk-div", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-main-algorithm", "data"),
+    State("store-distance-algorithm", 'data'),
+    prevent_initial_call=True
+)
+def get_store_data(n_clicks, ma_data, dis_data):
+    print(ma_data)
+    print(dis_data)
+    return []
 # 학습 버튼을 클릭 하게 되면, i
 # Main
 if __name__ == "__main__":

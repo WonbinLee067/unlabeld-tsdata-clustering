@@ -4,7 +4,6 @@ import core_components as cc
 
 def param_kmeans():
     params = html.Div([
-            html.Div(id='hidden-kmeans-div', style={'display':'none'}),
             dcc.Store(id='store-kmeans-param', data=[]),
             html.Label('Cluster 개수'),
             cc.num_input_layout('number-of-cluster', min=2, init_value=2),
