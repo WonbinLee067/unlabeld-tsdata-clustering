@@ -439,6 +439,7 @@ def get_store_data(n_clicks, ma_data, dis_data):
     print(ma_data)
     print(dis_data)
     return []
+
 # 학습 버튼을 클릭 하게 되면, i
 # Main
 if __name__ == "__main__":
