@@ -37,29 +37,26 @@ def getClassLabelFor(list, batch_size=190):
 # Cluster Algorithm
 def kmeans(dataset, n_clusters, n_init = 10, max_iter = 300, tol = e-4, normalization='standard'):
 
-    scaled_dataset = norm(dataset, normalization=normalization)
-    print("Scaled_dataset: \n{}".format(scaled_dataset))
-    cluster_data = KMeans(n_clusters=n_clusters, n_init = n_init, max_iter = max_iter, tol = tol).fit(scaled_dataset)
-    return cluster_data, scaled_dataset
+    cluster_data = KMeans(n_clusters=n_clusters, n_init = n_init, max_iter = max_iter, tol = tol).fit(dataset)
+    return cluster_data
+
 
 # DBSCAN
 def dbscan(dataset, eps=0.5, min_samples=5, normalization='standard'):
-   
-    scaled_dataset = norm(dataset, normalization=normalization)
+
     dbscan = DBSCAN(eps=eps, min_samples=min_samples)
-    cluster_data = dbscan.fit_predict(scaled_dataset)
-    return cluster_data, scaled_dataset
+    cluster_data = dbscan.fit_predict(dataset)
+    return cluster_data
 
 # Spectral Clustering
 def spectralClustering(dataset, n_clusters, n_init = 10, normalization='standard'):
     
-    scaled_dataset = norm(dataset, normalization=normalization)
-    cluster_data = SpectralClustering(n_clusters=n_clusters, n_init=n_init).fit_predict(scaled_dataset)
-    return cluster_data, scaled_dataset
+    cluster_data = SpectralClustering(n_clusters=n_clusters, n_init=n_init).fit_predict(dataset)
+    return cluster_data
 
 # Hierarchical Clustering
 def hierarchicalClustering(dataset, n_clusters, n_init = 10, linkage = 'ward', normalization='standard'):
 
-    scaled_dataset = norm(dataset, normalization=normalization)
-    cluster_data = AgglomerativeClustering(n_clusters = n_clusters, linkage = linkage )
-    return cluster_data, scaled_dataset
+    cluster_data = AgglomerativeClustering(n_clusters = n_clusters, linkage = linkage ).fit(dataset)
+    return cluster_data
+ 
