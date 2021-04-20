@@ -115,7 +115,7 @@ def MakeAutoencoderModel(image_size, dimension, optimizer, learning_rate, activa
     it = 2
     if image_size == 1028:
         it = 4
-    other_channel = image_size / 2
+    other_channel = 64
     filter_size, channel = decide_filter_channel(image_size, dimension)
     
     
