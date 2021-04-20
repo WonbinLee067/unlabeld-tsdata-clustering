@@ -32,7 +32,7 @@ class Autoencoder_Agent(object):
 
     def train(self, X_train, batch_size, epochs, validation_data):
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100,  min_delta=0.0001)
-        mc = ModelCheckpoint(f'insectWing_dimension_{self.dimension}', monitor='val_loss', verbose=1, save_best_only=True)
+        mc = ModelCheckpoint(f'insectWing_dimension_{self.dimension}.h5', monitor='val_loss', verbose=1, save_best_only=True)
         hist = self.model.fit(X_train,X_train,batch_size = batch_size,epochs=epochs,validation_data=(validation_data,validation_data), callbacks=[es, mc])
         return hist
 
