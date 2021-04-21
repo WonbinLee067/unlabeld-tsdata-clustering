@@ -6,6 +6,7 @@ import os, re, glob
 import cv2
 import numpy as np
 from model import CNNAutoEncoder_28, CNNAutoEncoder_96, MakeAutoencoderModel
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from PIL import Image
 from keras import backend as K
 class Autoencoder_Agent(object):
@@ -29,7 +30,10 @@ class Autoencoder_Agent(object):
                 self.compressed_layer = 11
 
     def train(self, X_train, batch_size, epochs, validation_data):
-        hist = self.model.fit(X_train,X_train,batch_size = batch_size,epochs=epochs,validation_data=(validation_data,validation_data))
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=100,  min_delta=0.0001)
+        mc = ModelCheckpoint(f'insectWing_dimension_{self.dimension}.h5', monitor='val_loss', verbose=1, save_best_only=True)
+        hist = self.model.fit(X_train,X_train,batch_size = batch_size,epochs=epochs,validation_data=(validation_data,validation_data), callbacks=[es, mc])
+#        hist = self.model.fit(X_train,X_train,batch_size = batch_size,epochs=epochs)
         return hist
 
 

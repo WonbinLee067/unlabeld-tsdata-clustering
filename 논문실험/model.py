@@ -110,12 +110,12 @@ def decide_filter_channel(image_size, dimension):
             return 16, 1
         else:
             print("Not good Value")
-def MakeAutoencoderModel(image_size, dimension, optimizer, learning_rate, activation='sigmoid', loss='mse'):
+def MakeAutoencoderModel(image_size, dimension, optimizer, learning_rate, activation='sigmoid', loss='binary_crossentropy'):
     assert image_size == 256 or image_size == 1024, "Wrong image Size"
     it = 2
     if image_size == 1028:
         it = 4
-    other_channel = image_size / 2
+    other_channel = 64
     filter_size, channel = decide_filter_channel(image_size, dimension)
     
     
