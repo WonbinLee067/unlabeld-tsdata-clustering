@@ -1,36 +1,25 @@
 # Import required libraries
-import pickle
-import copy
-import pathlib
-import urllib.request
+# import pickle
+# import copy
+# import pathlib
+# import urllib.request
+# import math
+# import datetime as dt
 import dash
-import math
-import datetime as dt
-import pandas as pd
 from dash.dependencies import Input, Output, State, ClientsideFunction
 import dash_core_components as dcc
 import dash_html_components as html
 
+import pandas as pd
+
 # Import for algorithm
-from params import ParameterDiv
-import main_algorithm as MA
-import par_clstr_algorithm as pCA
-import par_img_data as pid
-import par_dtw as pDtw
+from clusters import *
 from read_csv import csvDiv, parse_contents
 from text_data import textResultDiv
 from result_graph import graphDetail, graphCluster, graphBig
 from result_graph import GG
 import show_detail as sd
 
-
-
-import numpy as np
-from readFile import split_into_values, toRPdata
-from tslearn.preprocessing import TimeSeriesScalerMeanVariance, TimeSeriesResampler
-from sklearn.preprocessing import MinMaxScaler
-from utils import split_data, normalization_tool
-from agent import Autoencoder_Agent
 app = dash.Dash(
     __name__,
     meta_tags=[{"name": "viewport", "content": "width=device-width"}],
@@ -94,10 +83,19 @@ app.layout = html.Div(
         html.Div(
             [
                 # 파라미터 조작 컴포넌트
-                html.Div(
-                    [
-                        ParameterDiv()
-                    ],
+                html.Div([
+                    dcc.Dropdown(
+                        id='main-cluster-algorithm',
+                        options=[
+                                    {'label': 'TimeSeriesSample + KMeans', 'value':'ts_sample_kmeans'},
+                                    {'label': 'TimeSeriesSample + Hierarchical Cluster', 'value':'ts_sample_hierarchy'},
+                                    {'label': 'TimeSeriesSample + TimeSeriesKMeans', 'value':'ts_sample_ts_kmeans'},
+                                    {'label': 'RP + Autoencoder + Kmeans', 'value':'rp_ae_kmeans'},
+                                    {'label': 'RP + Autoencoder + Hierarchical Cluster', 'value':'rp_ae_hierarchy'},
+                                    {'label': 'RP + Autoencoder + DBSCAN', 'value':'rp_ae_dbscan'},
+                                ],
+                        value='ts_sample_kmeans'),
+                    html.Div(id='parameter-layout')],
                     className="pretty_container four columns",
                     id="cross-filter-options",
                 ),
@@ -153,86 +151,6 @@ app.layout = html.Div(
     style={"display": "flex", "flex-direction": "column"},
 )
 
-def MinMax(data):
-    MMS = MinMaxScaler().fit(data)
-    scaled = MMS.transform(data)
-    return scaled
-
-# 중요! ################################################
-## 지금 상황으로는 파라미터 적용을 할수가 없음 로직을 바꾸어야 한다.
-## 알고리즘을 애초에 먼저 선택 
-## -> 해당 알고리즘에 대한 파라미터 나열
-## -> 알고리즘 예) Rp+autoencoder+kmeans, RP+autoencoder+DBSCAN
-## ,RawImg+autoencoder+Kmeans + ...ㅋㅋㅋ
-## 바로 해당 알고리즘을 실행할 수 있는 파라미터를 얻고, 실행하기 위함이다..
-# ###########
-
-####                                                           ####
-# Main Algorithm 에 대한 Layout을 제공해 줍니다. MA: Main Algorithm #
-####                                                           ####
-@app.callback(
-    # my-output id를 가진 컴포넌트의 children 속성으로 들어간다.
-    Output(component_id='parma-for-main-algorithm', component_property='children'),
-    # my-input id 를 가진 컴포넌트의 value 속성을 가져온다.
-    Input(component_id='algorithm', component_property='value')
-)
-def update_parameter(input_value):
-    layout = []
-    if input_value == 'CNAE':
-        layout = MA.cnn_autoencoder()
-    elif input_value == 'TSKM':
-        layout = MA.time_sereies_kmeans()
-    elif input_value == 'LSAE':
-        layout = MA.lstm_autoencoder()
-    return layout
-
-####                                              ####
-# Clustering Algorithm에 대한 Parameter 를 제공합니다. #
-# pCA : params for Clustering Algorithm              #
-####                                              ####
-@app.callback(
-    Output('param-for-cluster-algorithm', 'children'),
-    Input('after-autoencoder-cluster-algorithm', 'value')
-)
-def clister_algorithm_param(cluster):
-    params = []
-    if cluster == 'KMS':
-        params = pCA.param_kmeans()
-    elif cluster == 'DBS':
-        params = pCA.param_dbscan()
-    return params
-
-####                                                           ####
-# CNN Auto Encoder의 데이터 형식으로, image data의 형식을 결정합니다.#
-# pid : params for image data                                     #
-####                                                           ####
-@app.callback(
-    Output(component_id='param-for-img-data', component_property='children'),
-    Input(component_id='before-autoencoder-img-data-type', component_property='value')
-)
-def image_data_param(data_type):
-    params = []
-    if data_type == 'RP':
-        params = pid.recurrence_plot()
-    elif data_type == 'RAW':
-        params = pid.raw_img()
-    return params
-
-####                                           ####
-# DTW / soft-DTW 에 대한 특정 파라미터를 생성합니다. #
-####                                           ####
-@app.callback(
-    Output(component_id='param-for-dtw', component_property='children'),
-    Input(component_id='distance-alogrithm', component_property='value')
-)
-def image_data_param(data_type):
-    params = []
-    if data_type == 'DTW':
-        params = pDtw.dtw()
-    elif data_type == 'SDT':
-        params = pDtw.soft_dtw()
-    return params
-
 
 ##read_csv
 @app.callback(Output('output-data-upload', 'children'),
@@ -277,37 +195,25 @@ def update_parameter( nth_cluster, detail_graph, num_graph):
     #최대 그래프 개수
 
     return layout, clsName, nMaxGraphs, num_graph, f"Number of data graphs per clusters (max: {nMaxGraphs})"
-
-# Store에 data를 담는다.
+#######################################################################
 @app.callback(
-    Output("store-main-algorithm", "data"),
-    Input("algorithm", "value"),
+    Output('parameter-layout', 'children'),
+    Input('main-cluster-algorithm', 'value')
 )
-def store_parameter(ma):
-    df = pd.DataFrame()
-    df['main_algorithm'] = [ma]
-    data = df.to_dict('records')
-    return data
-
-# CNN 관련 parameter
-@app.callback(
-    Output('store-cnn-param', 'data'),
-    Input("autoencoder-batch-size", "value"),
-    Input("autoencoder-learning-rate", "value"),
-    Input("after-autoencoder-cluster-algorithm", "value"),
-    Input("before-autoencoder-img-data-type", "value"),
-)
-def store_cnn_param(bs, lr, clag, imgdt):
-    df = pd.DataFrame()
-    df['batch_size'] = [bs]
-    df['learning_rate'] = [lr]
-    df['cluster_algorithm'] = [clag]
-    df['img-data-type'] = [imgdt]
-    data = df.to_dict('records')
-    return data
-
-# KMeans 관련 Parameter
-# KMeans 경우 여러 곳에서 사용이 가능 할 것이므로!, 공통된 id 이름을 사용
+def select_main_algorithm(algorithm):
+    if algorithm == 'ts_sample_kmeans':
+        return ts_sample_kmeans()
+    elif algorithm == 'ts_sample_hierarchy':
+        return ts_sample_hierarchy()
+    elif algorithm == 'rp_ae_kmeans':
+        return rp_ae_kmeans()
+    elif algorithm == 'rp_ae_hierarchy':
+        return rp_ae_hierarchy()
+    elif algorithm == 'rp_ae_dbscan':
+        return rp_ae_dbscan()
+#######################################################################
+#  각 알고리즘 별 변수 저장
+# KMeans 관련 parameter
 @app.callback(
     Output('store-kmeans-param', 'data'),
     Input("number-of-cluster", "value"),
@@ -325,7 +231,32 @@ def store_kmeans_param(ncl, tol, tni, tnk, rc):
     df['random_center'] = [rc]
     data = df.to_dict('records')
     return data
-
+# hirarchy cluster 관련 parameter
+@app.callback(
+    Output('store-hierarchy-param', 'data'),
+    Input("number-of-cluster", "value"),
+    Input("try-n-init", "value"),
+    Input("linkage", "value"),
+)
+def store_hirarchy_param(ncl, tni, lnk):
+    df = pd.DataFrame()
+    df['number_of_cluster'] = [ncl]
+    df['try_n_init'] = [tni]
+    df['linkage'] = [lnk]
+    data = df.to_dict('records')
+    return data
+# DBSCAN 관련 parameter
+@app.callback(
+    Output('store-dbscan-param', 'data'),
+    Input("dbscan-epsilon", "value"),
+    Input("dbscan-min-sample", "value")
+)
+def store_dbscan_param(eps, msp):
+    df = pd.DataFrame()
+    df['epsilon'] = [eps]
+    df['min_sample'] = [msp]
+    data = df.to_dict('records')
+    return data
 # Image Data(RP) 관련 Parameter
 @app.callback(
     Output('store-rp-param', 'data'),
@@ -343,103 +274,130 @@ def store_rp_param(dim, td, th, prtg):
     data = df.to_dict('records')
     return data
 
-# Raw Image 관련 Parameter
+# Autoencoder (ae) 관련 Parameter
 @app.callback(
-    Output('store-raw-img-param', 'data'),
-    Input('raw-img-sample', 'value')
+    Output('store-autoencoder-param', 'data'),
+    Input("autoencoder-batch-size", "value"),
+    Input("autoencoder-learning-rate", "value"),
+    Input("autoencoder-loss-function", "value"),
+    Input("autoencoder-activation-function", "value"),
 )
-def store_raw_img_param(sample):
+def store_ae_param(bs, lr, loss_f, act_f):
     df = pd.DataFrame()
-    df['sample'] = [sample]
+    df['batch_size'] = [bs]
+    df['learning_rate'] = [lr]
+    df['loss_function'] = [loss_f]
+    df['activation_function'] = [act_f]
     data = df.to_dict('records')
     return data
-# Time Series Kmeans 관련 parameter
-# 두 id가 동시에 나오면 상관 없다.
+#######################################################################
+## 군집화 알고리즘 별 파라미터 호출
+# timeSeriesSample + kmeans
 @app.callback(
-    Output('store-distance-algorithm', 'data'),
-    Input('distance-algorithm', "value"),
-)
-def store_cnn_param(dsag):
-    df = pd.DataFrame()
-    df['distance-alogrithm'] = [dsag]
-    data = df.to_dict('records')
-    return data
-
-#######################################################
-# 각 알고리즘마다 콜백을 실행하자!
-# 실행에만 prevent_initial_call=True 하면된다.
-# CNN 관련 알고리즘 실행!
-@app.callback(
-    Output("hidden-cnn-div", "children"),
+    Output("hidden-ts-sample-kmeans", "children"),
     Input("learn-button", "n_clicks"),
-    State("store-main-algorithm", "data"),
-    State("store-cnn-param", 'data'),
     State("store-kmeans-param", 'data'),
-    State("store-rp-param", 'data'),
-    prevent_initial_call=True
+    prevent_initial_call=True 
 )
-def exct_rp_autoencoder_kmeans(n_clicks, ma_data, cnn_data, km_data, rp_data):
-    print(ma_data)
-    print(cnn_data)
+def exct_ts_sample_kmeans(n_clicks, km_data):
     print(km_data)
-    print(rp_data)
-    # RP -> CNN -> KMenas알고리즘 적용
-
-    # df = pd.read_csv('../resources/testdata.csv')
-    # columns = ['chip', 'wire', 'segment']
-    # value = ['value']
-    # #df = pd.read_csv('resources/Dataset1.csv')
-    # #columns = ['Process', 'Step']
-    # #value = ['Value']
-
-    # df = df.loc[:, columns + value] #('chip', 'wire', 'value')는 사용자 입력
-    # size = 28
-    # result = split_into_values(df, columns)
-    # result_ = TimeSeriesResampler(sz=size).fit_transform(result)
-    # data = result_.reshape(result_.shape[0], 1, size)
-    # if cnn_data[0]['before-autoencoder-img-data-type'] == 'RP':
-    #     X = toRPdata(data)
-    #     X_scaled = np.empty((X.shape[0], size, size))
-    #     for i, data in enumerate(X):
-    #         X_scaled[i] = MinMax(data)
-    #     X_scaled = np.expand_dims(X_scaled, axis=3)
-    # if ma_data[0]['main_algorithm'] == 'CNAE':    
-    #     batch_size = cnn_data[0]['batch_size']
-    #     learning_rate = 0.01
-    #     #learning_rate = cnn_data[0]['learning_rate']
-    #     epochs = 5
-    #     optimizer='Adam'
-    #     loss='binary_crossentropy'
-    #     X_train, X_test, Y_train, Y_test = split_data(X_scaled, X_scaled) #데이터 분리
-
-    #     agent_28 = Autoencoder_Agent(28,optimizer,learning_rate)
-    #     agent_28.train(X_train,batch_size,epochs,X_test)
-    #     feature = agent_28.feature_extract(X_train)
-    #     print(feature)
     return []
+# timeSeriesSample + hierarchy
 @app.callback(
-    Output("hidden-cnn-div", "children"),
+    Output("hidden-ts-sample-hierarchy", "children"),
     Input("learn-button", "n_clicks"),
-    State("store-main-algorithm", "data"),
-    State("store-cnn-param", 'data'),
+    State("store-hierarchy-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_ts_sample_kmeans(n_clicks, hrc_data):
+    print(hrc_data)
+    return []
+# rp-ae-kmeans
+@app.callback(
+    Output("hidden-rp-ae-kmeans", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-rp-param", 'data'),
+    State("store-autoencoder-param", 'data'),
     State("store-kmeans-param", 'data'),
-    State("store-raw-img-param", 'data'),
-    prevent_initial_call=True
+    prevent_initial_call=True 
 )
-def exct_raw_autoencoder_kmeans(n_clicks, ma_data, cnn_data, km_data, raw_img_data):
+def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data):
+    print(rp_data)
+    print(ae_data)
+    print(km_data)
     return []
-
+# rp-ae-hierarchy
 @app.callback(
-    Output("hidden-tsk-div", "children"),
+    Output("hidden-rp-ae-hierarchy", "children"),
     Input("learn-button", "n_clicks"),
-    State("store-main-algorithm", "data"),
-    State("store-distance-algorithm", 'data'),
-    prevent_initial_call=True
+    State("store-rp-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-hierarchy-param", 'data'),
+    prevent_initial_call=True 
 )
-def get_store_data(n_clicks, ma_data, dis_data):
-    print(ma_data)
-    print(dis_data)
+def exct_rp_autoencoder_hierarchy(n_clicks, rp_data, ae_data, hrc_data):
+    print(rp_data)
+    print(ae_data)
+    print(hrc_data)
     return []
+# rp-ae-dbscan
+@app.callback(
+    Output("hidden-rp-ae-dbscan", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-rp-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-dbscan-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_rp_autoencoder_dbscan(n_clicks, rp_data, ae_data, dbs_data):
+    print(rp_data)
+    print(ae_data)
+    print(dbs_data)
+    return []
+#######################################################
+# import numpy as np
+# from readFile import split_into_values, toRPdata
+# from tslearn.preprocessing import TimeSeriesScalerMeanVariance, TimeSeriesResampler
+# from sklearn.preprocessing import MinMaxScaler
+# from utils import split_data, normalization_tool
+# from agent import Autoencoder_Agent
+# def MinMax(data):
+#     MMS = MinMaxScaler().fit(data)
+#     scaled = MMS.transform(data)
+#     return scaled
+# RP -> CNN -> KMenas알고리즘 적용
+
+# df = pd.read_csv('../resources/testdata.csv')
+# columns = ['chip', 'wire', 'segment']
+# value = ['value']
+# #df = pd.read_csv('resources/Dataset1.csv')
+# #columns = ['Process', 'Step']
+# #value = ['Value']
+
+# df = df.loc[:, columns + value] #('chip', 'wire', 'value')는 사용자 입력
+# size = 28
+# result = split_into_values(df, columns)
+# result_ = TimeSeriesResampler(sz=size).fit_transform(result)
+# data = result_.reshape(result_.shape[0], 1, size)
+# if cnn_data[0]['before-autoencoder-img-data-type'] == 'RP':
+#     X = toRPdata(data)
+#     X_scaled = np.empty((X.shape[0], size, size))
+#     for i, data in enumerate(X):
+#         X_scaled[i] = MinMax(data)
+#     X_scaled = np.expand_dims(X_scaled, axis=3)
+# if ma_data[0]['main_algorithm'] == 'CNAE':    
+#     batch_size = cnn_data[0]['batch_size']
+#     learning_rate = 0.01
+#     #learning_rate = cnn_data[0]['learning_rate']
+#     epochs = 5
+#     optimizer='Adam'
+#     loss='binary_crossentropy'
+#     X_train, X_test, Y_train, Y_test = split_data(X_scaled, X_scaled) #데이터 분리
+
+#     agent_28 = Autoencoder_Agent(28,optimizer,learning_rate)
+#     agent_28.train(X_train,batch_size,epochs,X_test)
+#     feature = agent_28.feature_extract(X_train)
+#     print(feature)
 
 # 학습 버튼을 클릭 하게 되면, i
 # Main
