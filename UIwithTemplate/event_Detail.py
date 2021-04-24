@@ -1,115 +1,226 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_table
 from dash.dependencies import Input, Output, State
 
-import main_algorithm as MA
-import core_components as cc
-from result_graph import *
-from result_graph import GG
+from clusters import *
+import pandas as pd
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-num_clusters = len(GG)
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 
+# 각 세부 알고리즘 dropdown! 
+## TimeSereisRandom + KMeans
+## TimeSereisRandom + 계층적군집화
+## TimeSereisRandom + TimeSereisKmeans
+## Rp+autoencoder+kmeans
+## Rp+autoencoder+계층군집
+## RP+autoencoder+DBSCAN
+
+# 세부 기능 별 parameter
+## TimeSereisRandom
+#### size
+## KMeans
+#### cluster 개수
+#### n_init (Kmeans 시도할 횟수(함수 내부에서))
+#### max_iter (각 kmeans 시도할때 마다 반복할 횟수)
+#### tol (수렴 관용점..)
+## 계층적 군집화
+#### cluster 개수
+#### n_init (Kmeans 시도할 횟수(함수 내부에서))
+#### linkage ? 
+## DBSCAN
+#### epsilon
+#### min_samples
+## RP 알고리즘
+#### dimension
+#### time_delay
+#### threshold
+#### percentage
+#### flatten
+## Autoencoder
+#### size
+#### optimizer
+#### learning_rate
+#### loss_function
+#### activation_function
+
 app.layout = html.Div([
-     html.Div([
-          # 군집화 결과 그래프 컴포넌트
-        html.Div(
-            html.Div(
-                graphCluster(),
-                className = 'box-scroll'
-            ),
-            id="countGraphContainer",
-            className="pretty_container",
-        ),
-        html.Div([
-            # 세부적 결과 그래프 컴포넌트
-            html.Div(
-                #보기1
-                # [graphDetail()]
-                # className="pretty_container seven columns",
-                #보기2
-                # [graphBig()],
-                # className="pretty_container seven columns fullgraph_class",
-                id='detail-graph-output'
-            ),
-            # 세부적 결과 그래프 선택 조작 컴포넌트
-            ## 여기서 컴포넌트를 조작하여 위 세부적 결과 그래프 형태를 선택한다.
-            html.Div(
-                [
-                    html.Label("Choose cluster"),
-                    cc.radio_layout("nth-cluster", 
-                    [
-                        {'label': str(i+1), 'value': i}
-                        for i in range(num_clusters)
-                    ], 0),
-                    # cc.dropdown_layout("nth-cluster",
-                    # [
-                    #     {'label': str(i+1), 'value': i}
-                    #     for i in range(num_clusters)
-                    # ], 0),
-                    html.Label("Choose Type of detailed graphs"),
-                    cc.dropdown_layout("detail-graph-input", 
-                    [
-                        {'label': 'Graph Detail', 'value': 'GrDt'},
-                        {'label': 'Graph Big', 'value': 'GrBg'}
-                    ], 'GrDt'),
-                    html.Label("Number of data graphs per clusters", id="label-n-graphs"),
-                    cc.num_input_layout('num-of-graphs', min=1, init_value=1),
-                    # cc.radio_layout('num-of-graphs', 
-                    # [
-                    #     {'label': '6', 'value': 6},
-                    #     {'label': '9', 'value': 9},
-                    #     {'label': '12', 'value': 12}
-                    # ], 6),
-                    # html.Button('적용하기', id='detail-graph-submit', n_clicks=0)
+    dcc.Dropdown(
+        id='main-cluster-algorithm',
+        options=[
+                    {'label': 'TimeSeriesSample + KMeans', 'value':'ts_sample_kmeans'},
+                    {'label': 'TimeSeriesSample + Hierarchical Cluster', 'value':'ts_sample_hierarchy'},
+                    {'label': 'TimeSeriesSample + TimeSeriesKMeans', 'value':'ts_sample_ts_kmeans'},
+                    {'label': 'RP + Autoencoder + Kmeans', 'value':'rp_ae_kmeans'},
+                    {'label': 'RP + Autoencoder + Hierarchical Cluster', 'value':'rp_ae_hierarchy'},
+                    {'label': 'RP + Autoencoder + DBSCAN', 'value':'rp_ae_dbscan'},
                 ],
-                className="",
-            )], 
-            className="pretty_container row flex-display", 
-        )
-    ])
+        value='ts_sample_kmeans'),
+    html.Div(id='parameter-layout'),
+    html.Button("학습 시작하기", id="learn-button")
 ])
 
-
-####                                                           ####
-# 컨트롤 컴포넌트에 의해 세부적 그래프 컴포넌트가 달라집니다. #
-####                                                           ####
 @app.callback(
-    # my-output id를 가진 컴포넌트의 children 속성으로 들어간다.
-    Output(component_id='detail-graph-output', component_property='children'),
-    Output(component_id='detail-graph-output', component_property='className'),
-    Output(component_id='num-of-graphs', component_property='max'),
-    Output(component_id='num-of-graphs', component_property='value'),
-    Output(component_id='label-n-graphs', component_property='children'),
-    # my-input id 를 가진 컴포넌트의 value 속성을 가져온다.
-    # Input('detail-graph-submit', 'n_clicks'),
-    Input(component_id='nth-cluster', component_property='value'),
-    Input(component_id='detail-graph-input', component_property='value'),
-    Input(component_id='num-of-graphs', component_property='value')
+    Output('parameter-layout', 'children'),
+    Input('main-cluster-algorithm', 'value')
 )
-def update_parameter( nth_cluster, detail_graph, num_graph):
-    layout = []
-    clsName = ''
-    nMaxGraphs = len(GG[nth_cluster])
-    if num_graph > nMaxGraphs:
-        num_graph = nMaxGraphs
-    if detail_graph == 'GrDt':
-        layout = graphDetail(nth_cluster, num_graph)
-        clsName = "box-scroll"
-    elif detail_graph == 'GrBg':
-        layout = graphBig(nth_cluster, num_graph)
-        clsName = "fullgraph_class"
-    #최대 그래프 개수
-    
-    return layout, clsName, nMaxGraphs, num_graph, f"Number of data graphs per clusters (max: {nMaxGraphs})"
-# input 으로 클러스터 넘버를 얻어옴
-# output : Max 값을 알려줌
-# output: Max 값이 넘었을때, 값을 고쳐줌
-# output  : 
+def select_main_algorithm(algorithm):
+    if algorithm == 'ts_sample_kmeans':
+        return ts_sample_kmeans()
+    elif algorithm == 'ts_sample_hierarchy':
+        return ts_sample_hierarchy()
+    elif algorithm == 'rp_ae_kmeans':
+        return rp_ae_kmeans()
+    elif algorithm == 'rp_ae_hierarchy':
+        return rp_ae_hierarchy()
+    elif algorithm == 'rp_ae_dbscan':
+        return rp_ae_dbscan()
+
+#######################################################################
+#  각 알고리즘 별 변수 저장
+# KMeans 관련 parameter
+@app.callback(
+    Output('store-kmeans-param', 'data'),
+    Input("number-of-cluster", "value"),
+    Input("tolerance", "value"),
+    Input("try-n-init", "value"),
+    Input("try-n-kmeans", "value"),
+    Input("random-center", "value"),
+)
+def store_kmeans_param(ncl, tol, tni, tnk, rc):
+    df = pd.DataFrame()
+    df['number_of_cluster'] = [ncl]
+    df['tolerance'] = [tol]
+    df['try_n_init'] = [tni]
+    df['try_n_kmeans'] = [tnk]
+    df['random_center'] = [rc]
+    data = df.to_dict('records')
+    return data
+# hirarchy cluster 관련 parameter
+@app.callback(
+    Output('store-hierarchy-param', 'data'),
+    Input("number-of-cluster", "value"),
+    Input("try-n-init", "value"),
+    Input("linkage", "value"),
+)
+def store_hirarchy_param(ncl, tni, lnk):
+    df = pd.DataFrame()
+    df['number_of_cluster'] = [ncl]
+    df['try_n_init'] = [tni]
+    df['linkage'] = [lnk]
+    data = df.to_dict('records')
+    return data
+# DBSCAN 관련 parameter
+@app.callback(
+    Output('store-dbscan-param', 'data'),
+    Input("dbscan-epsilon", "value"),
+    Input("dbscan-min-sample", "value")
+)
+def store_dbscan_param(eps, msp):
+    df = pd.DataFrame()
+    df['epsilon'] = [eps]
+    df['min_sample'] = [msp]
+    data = df.to_dict('records')
+    return data
+# Image Data(RP) 관련 Parameter
+@app.callback(
+    Output('store-rp-param', 'data'),
+    Input("dimension", "value"),
+    Input("time-delay", "value"),
+    Input("threshold", "value"),
+    Input("percentage", "value"),
+)
+def store_rp_param(dim, td, th, prtg):
+    df = pd.DataFrame()
+    df['dimension'] = [dim]
+    df['time_delay'] = [td]
+    df['threshold'] = [th]
+    df['percentage'] = [prtg]
+    data = df.to_dict('records')
+    return data
+
+# Autoencoder (ae) 관련 Parameter
+@app.callback(
+    Output('store-autoencoder-param', 'data'),
+    Input("autoencoder-batch-size", "value"),
+    Input("autoencoder-learning-rate", "value"),
+    Input("autoencoder-loss-function", "value"),
+    Input("autoencoder-activation-function", "value"),
+)
+def store_ae_param(bs, lr, loss_f, act_f):
+    df = pd.DataFrame()
+    df['batch_size'] = [bs]
+    df['learning_rate'] = [lr]
+    df['loss_function'] = [loss_f]
+    df['activation_function'] = [act_f]
+    data = df.to_dict('records')
+    return data
+#######################################################################
+## 군집화 알고리즘 별 파라미터 호출
+# timeSeriesSample + kmeans
+@app.callback(
+    Output("hidden-ts-sample-kmeans", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-kmeans-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_ts_sample_kmeans(n_clicks, km_data):
+    print(km_data)
+    return []
+# timeSeriesSample + hierarchy
+@app.callback(
+    Output("hidden-ts-sample-hierarchy", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-hierarchy-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_ts_sample_kmeans(n_clicks, hrc_data):
+    print(hrc_data)
+    return []
+# rp-ae-kmeans
+@app.callback(
+    Output("hidden-rp-ae-kmeans", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-rp-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-kmeans-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data):
+    print(rp_data)
+    print(ae_data)
+    print(km_data)
+    return []
+# rp-ae-hierarchy
+@app.callback(
+    Output("hidden-rp-ae-hierarchy", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-rp-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-hierarchy-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_rp_autoencoder_hierarchy(n_clicks, rp_data, ae_data, hrc_data):
+    print(rp_data)
+    print(ae_data)
+    print(hrc_data)
+    return []
+# rp-ae-dbscan
+@app.callback(
+    Output("hidden-rp-ae-dbscan", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-rp-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-dbscan-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_rp_autoencoder_dbscan(n_clicks, rp_data, ae_data, dbs_data):
+    print(rp_data)
+    print(ae_data)
+    print(dbs_data)
+    return []
 
 
 if __name__ == '__main__':

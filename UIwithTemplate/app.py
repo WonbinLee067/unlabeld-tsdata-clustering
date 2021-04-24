@@ -17,7 +17,6 @@ import main_algorithm as MA
 import par_clstr_algorithm as pCA
 import par_img_data as pid
 import par_dtw as pDtw
-import core_components as cc
 from read_csv import csvDiv, parse_contents
 from text_data import textResultDiv
 from result_graph import graphDetail, graphCluster, graphBig
@@ -164,7 +163,9 @@ def MinMax(data):
 ## 알고리즘을 애초에 먼저 선택 
 ## -> 해당 알고리즘에 대한 파라미터 나열
 ## -> 알고리즘 예) Rp+autoencoder+kmeans, RP+autoencoder+DBSCAN
-## ,RawImg+autoencoder+Kmeans + ...ㅋㅋㅋ###########
+## ,RawImg+autoencoder+Kmeans + ...ㅋㅋㅋ
+## 바로 해당 알고리즘을 실행할 수 있는 파라미터를 얻고, 실행하기 위함이다..
+# ###########
 
 ####                                                           ####
 # Main Algorithm 에 대한 Layout을 제공해 줍니다. MA: Main Algorithm #
