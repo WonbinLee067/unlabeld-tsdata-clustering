@@ -7,6 +7,7 @@ import dash_daq as daq
 def kmeans_layout():
     return html.Div(id='kmeans-param', children=[
         dcc.Store(id='store-kmeans-param', data=[]),
+        html.H5("KMeans Parameters"),
         html.Label('Cluster 개수'),
         dcc.Input(id='number-of-cluster', min=2, value=2, type='number'),
         html.Label('Tolerance, default = 1e-4'),
@@ -20,18 +21,22 @@ def kmeans_layout():
         dcc.Input(id='try-n-kmeans', min=10, value=300, type='number'),
         html.Label('중심 랜덤으로 지정하기'),
         daq.BooleanSwitch(id='random-center', on=False, label="랜덤 사용", labelPosition='top'),
+        html.Hr()
     ])
 def dbscan_layout():
     return html.Div(id='dbscan-param', children=[
         dcc.Store(id='store-dbscan-param', data=[]),
+        html.H5("DBSCAN Parameters"),
         html.Label('Epsilon 크기'),
         dcc.Input(id='dbscan-epsilon', min=0, max=1, value=0.5, type='number'),
         html.Label('min-sample 크기(정수)'),
         dcc.Input(id='dbscan-min-sample', min=1, value=5, type='number'),
+        html.Hr()
     ])
 def hierarchy_layout():
     return html.Div(id='hierarchy-param', children=[
         dcc.Store(id='store-hierarchy-param', data=[]),
+        html.H5("Hierarchy Parameters"),
         html.Label('Cluster 개수'),
         dcc.Input(id='number-of-cluster', min=2, value=2, type='number'),
         html.Label('n-init'),
@@ -42,12 +47,13 @@ def hierarchy_layout():
             options=[
                 {'label': 'ward', 'value': 'ward'}
             ],
-            value='ward')
+            value='ward'),
+        html.Hr()
     ])
 def rp_layout():
     return html.Div(id='rp-param', children=[
         dcc.Store(id='store-rp-param', data=[]),
-        html.H4("RP Parameters"),
+        html.H5("RP Parameters"),
         html.H6("Dimension"),
         html.Label("RP 궤적의 차원수를 결정한다. 공간 궤적 좌표 생성에 쓰이는 데이터 개수이다."),
         dcc.Input(id='dimension', value=1, min=1, type='number'),
@@ -66,11 +72,13 @@ def rp_layout():
             {'label': 'None', 'value' : 'N'}
         ], value='F'),
         html.Label("percentage if point or distance"),
-        dcc.Slider(id='percentage', min=10, max=60, marks={i: '{}'.format(i) for i in range(10, 61, 10)}, value=1, step=1)
+        dcc.Slider(id='percentage', min=10, max=60, marks={i: '{}'.format(i) for i in range(10, 61, 10)}, value=1, step=1),
+        html.Hr()
     ])
 def autoencoder_layout():
     return html.Div(id='autoencoder-param', children=[
         dcc.Store(id='store-autoencoder-param', data=[]),
+        html.H5("Autoencoder Parameters"),
         html.Label('Batch Size'),
         dcc.RadioItems(id='autoencoder-batch-size', 
             options=[
@@ -89,4 +97,5 @@ def autoencoder_layout():
             options=[
                 {'label': 'sigmoid', 'value':'sigmoid'}
             ], value='sigmoid'),
+        html.Hr()
     ])

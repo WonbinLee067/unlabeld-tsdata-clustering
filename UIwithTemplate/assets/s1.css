@@ -80,7 +80,7 @@
     width: 22%;
   }
   .four.columns {
-    width: 20.6666666667%;
+    width: 25.6666666667%;
   }
   .five.columns {
     width: 39.3333333333%;
@@ -92,7 +92,7 @@
     width: 96%;
   }
   .eight.columns {
-    width: 75.3333333333%;
+    width: 70.3333333333%;
   }
   .nine.columns {
     width: 74%;
@@ -749,7 +749,7 @@ there.
 #dimension,
 #time-delay,
 #percentage{
-  width: 70%;
+  width: 90%;
 }
 
 #algorithm > div{
@@ -763,3 +763,4 @@ there.
 #random_center{
   text-align: left;
 }
+
