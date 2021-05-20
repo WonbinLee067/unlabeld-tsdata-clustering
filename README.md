@@ -17,6 +17,7 @@
 - Wavelet[특징 추출 알고리즘] + 군집화
 - 단순 Autoencoder
 - Raw Data의 단순 시각화 그래프 저장 -> CNN-Autoencoder에 적용 -> 특징 추출 후, 이를 기반으로 하여 군집화
+- TimeSeriesRESampler + KMeans 사용
 
 ** 군집화 알고리즘
 - K-Means
