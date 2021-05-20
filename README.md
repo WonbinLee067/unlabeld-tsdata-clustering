@@ -38,3 +38,15 @@
 - pip install keras
 - pip install numpy
 - pip install pyts
+- pip install pandas
+- pip install jupyter-dash
+- pip install pywavelets
+- pip install tslearn
+- pip install scikit-learn
+
+## 시연 영상
+
+
+https://user-images.githubusercontent.com/56811654/118953747-10071800-b998-11eb-97bb-f83138cc2c52.mp4
+
+
